@@ -1,0 +1,10 @@
+.badge-overlay {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 0.7rem;
+  border-radius: 50%;
+}
+ion-button {
+  position: relative; /* required so badge positions relative to button */
+}

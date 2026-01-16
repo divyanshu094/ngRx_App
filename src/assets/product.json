@@ -1,0 +1,116 @@
+[
+  {
+    "id": "P12345",
+    "name": "Wireless Headphones",
+    "description": "Noise-cancelling over-ear headphones with 30 hours battery life",
+    "type": "Electronics",
+    "category": "Headphones",
+    "brand": "SoundMax",
+    "price": {
+      "currency": "USD",
+      "amount": 149.99,
+      "discount": {
+        "type": "percentage",
+        "value": 10
+      },
+      "finalAmount": 134.99
+    },
+    "stock": {
+      "quantity": 120,
+      "availability": true
+    },
+    "images": [
+      "https://example.com/images/headphone-front.jpg",
+      "https://example.com/images/headphone-side.jpg"
+    ],
+    "rating": {
+      "average": 4.5,
+      "count": 328
+    },
+    "attributes": {
+      "color": "Black",
+      "connectivity": "Bluetooth 5.0",
+      "batteryLife": "30h",
+      "weight": "250g"
+    },
+    "tags": ["wireless", "noise-cancelling", "bluetooth", "electronics"],
+    "createdAt": "2025-09-09T10:30:00Z",
+    "updatedAt": "2025-09-09T12:00:00Z"
+  },
+  {
+    "id": "P12346",
+    "name": "Smart Watch",
+    "description": "Waterproof smartwatch with heart rate monitor and GPS",
+    "type": "Electronics",
+    "category": "Wearables",
+    "brand": "FitLife",
+    "price": {
+      "currency": "USD",
+      "amount": 199.99,
+      "discount": {
+        "type": "flat",
+        "value": 20
+      },
+      "finalAmount": 179.99
+    },
+    "stock": {
+      "quantity": 80,
+      "availability": true
+    },
+    "images": [
+      "https://example.com/images/smartwatch-front.jpg",
+      "https://example.com/images/smartwatch-side.jpg"
+    ],
+    "rating": {
+      "average": 4.7,
+      "count": 512
+    },
+    "attributes": {
+      "color": "Silver",
+      "connectivity": "Bluetooth 5.1",
+      "batteryLife": "7d",
+      "waterproof": true
+    },
+    "tags": ["smartwatch", "fitness", "wearables"],
+    "createdAt": "2025-09-08T14:00:00Z",
+    "updatedAt": "2025-09-09T09:00:00Z"
+  },
+  {
+    "id": "P12347",
+    "name": "Gaming Laptop",
+    "description": "High-performance gaming laptop with RTX graphics and 16GB RAM",
+    "type": "Electronics",
+    "category": "Laptops",
+    "brand": "GamePro",
+    "price": {
+      "currency": "USD",
+      "amount": 1499.99,
+      "discount": {
+        "type": "percentage",
+        "value": 15
+      },
+      "finalAmount": 1274.99
+    },
+    "stock": {
+      "quantity": 25,
+      "availability": true
+    },
+    "images": [
+      "https://example.com/images/laptop-front.jpg",
+      "https://example.com/images/laptop-side.jpg"
+    ],
+    "rating": {
+      "average": 4.8,
+      "count": 220
+    },
+    "attributes": {
+      "processor": "Intel i7",
+      "ram": "16GB",
+      "storage": "1TB SSD",
+      "graphics": "RTX 3060"
+    },
+    "tags": ["gaming", "laptop", "performance"],
+    "createdAt": "2025-09-07T10:00:00Z",
+    "updatedAt": "2025-09-09T08:30:00Z"
+  }
+]
