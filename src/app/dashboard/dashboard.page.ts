@@ -15,6 +15,8 @@ import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../components/header/header.component';
 import { ApiService } from '../common/api-service';
 import { HttpClientModule } from '@angular/common/http';
+import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
+import { LoggerService } from '../services/logger-service';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,20 +28,34 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class DashboardPage implements OnInit {
   groceries$?: Observable<Grocery[]>
-  constructor(private store: Store<{ groceries: Grocery[] }>, private apiService: ApiService) {
+  constructor(private store: Store<{ groceries: Grocery[] }>, private apiService: ApiService, private logger: LoggerService) {
     addIcons({ remove, trash, add, cart });
   }
 
   ngOnInit() {
-    // this.groceries$ = this.store.select("groceries")
+    this.groceries$ = this.store.select("groceries")
     // this.apiService.getData("/api/products").subscribe((res) => {
     //   console.log(res);
     //   this.groceries$ = res;
     // })
 
-    this.groceries$ = this.apiService.getData("/api/products").pipe(
-      map((res: any) => res.products || res)
-    );
+    // this.groceries$ = this.apiService.getData("/api/products").pipe(
+    //   map((res: any) => res.products || res)
+    // );
+  }
+
+  ionViewDidEnter() {
+    this.setUserContext({ id: "10", role: "user" });
+  }
+
+  setUserContext(user: any) {
+    FirebaseCrashlytics.setUserId(user.id); // Use hashed ID in real apps
+    FirebaseCrashlytics.setCustomKey({
+      key: 'role',
+      value: user.role,
+      type: 'string'
+    });
+    this.logger.debug('Entered PaymentPage');
   }
 
   increment(item: Grocery) {

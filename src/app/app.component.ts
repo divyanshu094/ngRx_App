@@ -4,6 +4,8 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { IonApp, IonSplitPane, IonMenu, IonContent, IonList, IonListHeader, IonNote, IonMenuToggle, IonItem, IonIcon, IonLabel, IonRouterOutlet, IonRouterLink } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, heartOutline, heartSharp, archiveOutline, archiveSharp, trashOutline, trashSharp, warningOutline, warningSharp, bookmarkOutline, bookmarkSharp } from 'ionicons/icons';
+import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
+import { LoggerService } from './services/logger-service';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +23,28 @@ export class AppComponent {
     { title: 'Spam', url: '/folder/spam', icon: 'warning' },
   ];
   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
-  constructor() {
+  constructor(private logger: LoggerService) {
     addIcons({ mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, heartOutline, heartSharp, archiveOutline, archiveSharp, trashOutline, trashSharp, warningOutline, warningSharp, bookmarkOutline, bookmarkSharp });
+    this.initializeCrashlytics();
+  }
+
+  async initializeCrashlytics() {
+    await FirebaseCrashlytics.setCustomKey({
+      key: 'platform',
+      value: 'android',
+      type: 'string'
+    });
+
+    await FirebaseCrashlytics.setCustomKey({
+      key: 'environment',
+      value: 'production',
+      type: 'string'
+    });
+     await FirebaseCrashlytics.setCustomKey({
+      key: 'app_version',
+      value: '1.0',
+      type: 'string'
+    });
+    this.logger.info('Crashlytics initialized');
   }
 }
