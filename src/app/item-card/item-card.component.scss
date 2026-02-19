@@ -1,21 +1,27 @@
 .product-card {
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease;
+    margin: 2%;
 
   &:active {
     transform: scale(0.98);
   }
+
+  ion-card-content{
+    margin: 0 auto;
+    padding: 0 5% 10%;
+  }
 }
 
 .image-wrapper {
-  height: 140px;
+  height: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #f8f8f8;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 
   img {
     max-height: 100px;

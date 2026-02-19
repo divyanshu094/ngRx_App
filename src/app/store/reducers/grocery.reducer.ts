@@ -9,8 +9,16 @@ const initialState: Grocery[] = []
 
 export const groceryReducer = createReducer(
     initialState,
+  
     on(loadGroceriesSuccess, (state, { groceries }) => {
-        return groceries;
+        return groceries.map(product => {
+            const existing = state.find(s => s.id === product.id);
+
+            return {
+                ...product,
+                quantity: existing?.quantity ?? 0
+            };
+        });
     }),
 
     on(increaseQuantity, (state, action) => {
