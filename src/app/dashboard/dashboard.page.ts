@@ -5,18 +5,19 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonCol, 
 import { Grocery } from '../models/grocery.model';
 import { provideState, Store } from '@ngrx/store';
 import { groceryReducer } from '../store/reducers/grocery.reducer';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { addIcons } from 'ionicons';
 import { remove, add, cart, trash } from 'ionicons/icons';
 import { addToBucket, removeFromBucket } from '../store/actions/bucket.action';
 import { Bucket } from '../models/bucket.model';
-import { decreaseQuantity, increaseQuantity } from '../store/actions/grocery.action';
+import { decreaseQuantity, increaseQuantity, loadGroceries } from '../store/actions/grocery.action';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../components/header/header.component';
 import { ApiService } from '../common/api-service';
 import { HttpClientModule } from '@angular/common/http';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { LoggerService } from '../services/logger-service';
+import { ItemCardComponent } from "../item-card/item-card.component";
 
 @Component({
   selector: 'app-dashboard',
@@ -24,7 +25,7 @@ import { LoggerService } from '../services/logger-service';
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonList, IonItem, IonCol, IonGrid, IonRow, IonButton,
-    IonButtons, IonInput, IonIcon, RouterLink, IonBadge, HeaderComponent, HttpClientModule]
+    IonButtons, IonInput, IonIcon, RouterLink, IonBadge, HeaderComponent, HttpClientModule, ItemCardComponent]
 })
 export class DashboardPage implements OnInit {
   groceries$?: Observable<Grocery[]>
@@ -33,11 +34,21 @@ export class DashboardPage implements OnInit {
   }
 
   ngOnInit() {
+    this.store.dispatch(loadGroceries());
     this.groceries$ = this.store.select("groceries")
     // this.apiService.getData("/api/products").subscribe((res) => {
     //   console.log(res);
-    //   this.groceries$ = res;
+    //   this.groceries$ = of(res);
     // })
+
+  //   this.groceries$ = this.apiService.getData("/api/products").pipe(
+  //   map((products: any[]) =>
+  //     products.map(({ _id, ...rest }) => ({
+  //       id: _id,
+  //       ...rest
+  //     }))
+  //   )
+  // );
 
     // this.groceries$ = this.apiService.getData("/api/products").pipe(
     //   map((res: any) => res.products || res)

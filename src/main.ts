@@ -13,6 +13,7 @@ import { groceryReducer } from './app/store/reducers/grocery.reducer';
 import { bucketReducer } from './app/store/reducers/bucket.reducer';
 import { hydrationMetaReducer } from './app/store/reducers/meta.reducer';
 import { reducers } from './app/store';
+import { GroceryEffects } from './app/store/effects/grocery.effects';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -24,7 +25,7 @@ bootstrapApplication(AppComponent, {
      reducers,
       { metaReducers: [hydrationMetaReducer] }
     ),
-    provideEffects(),
+    provideEffects([GroceryEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
   ],
 });

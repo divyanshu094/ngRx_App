@@ -1,19 +1,18 @@
 import { createReducer, on } from "@ngrx/store";
 import { Grocery } from "src/app/models/grocery.model";
-import { decreaseQuantity, increaseQuantity } from "../actions/grocery.action";
+import { decreaseQuantity, increaseQuantity, loadGroceriesSuccess } from "../actions/grocery.action";
 
 
-const initialState:Grocery[] = [
-    { "id": 1, "name": "milk", "type": "fruit","quantity":0 },
-    { "id": 2, "name": "banana", "type": "fruit","quantity":0 },
-    { "id": 3, "name": "chips", "type": "snacks","quantity":0 },
-    { "id": 4, "name": "chocolate", "type": "snacks","quantity":0 }
-]
+const initialState: Grocery[] = []
 
 // export const groceryReducer=createReducer(initialState);
 
 export const groceryReducer = createReducer(
     initialState,
+    on(loadGroceriesSuccess, (state, { groceries }) => {
+        return groceries;
+    }),
+
     on(increaseQuantity, (state, action) => {
         const bucketItem = state.find(item => item.id === action.payload.id)
         if (bucketItem) {
