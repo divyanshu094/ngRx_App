@@ -69,22 +69,22 @@ export class DashboardPage implements OnInit {
     this.logger.debug('Entered PaymentPage');
   }
 
-  increment(item: Grocery) {
-    const payload: any = {
-      id: item.id,
-      name: item.name,
-      quantity: 1
-    }
-    this.store.dispatch(addToBucket({ payload: payload }));
-    this.store.dispatch(increaseQuantity({ payload: payload }));
-  }
+  // increment(item: Grocery) {
+  //   const payload: any = {
+  //     id: item.id,
+  //     name: item.name,
+  //     quantity: 1
+  //   }
+  //   this.store.dispatch(addToBucket({ payload: payload }));
+  //   this.store.dispatch(increaseQuantity({ payload: payload }));
+  // }
 
-  decrement(item: any) {
-    const payload: any = {
-      id: item.id,
-    }
-    this.store.dispatch(removeFromBucket({ payload: payload }));
-    this.store.dispatch(decreaseQuantity({ payload: payload }));
-  }
+  // decrement(item: any) {
+  //   const payload: any = {
+  //     id: item.id,
+  //   }
+  //   this.store.dispatch(removeFromBucket({ payload: payload }));
+  //   this.store.dispatch(decreaseQuantity({ payload: payload }));
+  // }
 
 }
