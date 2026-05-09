@@ -1,11 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, signal, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonContent, IonItem, IonButton, IonInput, IonIcon, IonBadge, IonRadioGroup, IonRadio } from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonButton, IonInput, IonIcon, IonBadge } from '@ionic/angular/standalone';
 import { Grocery } from '../models/grocery.model';
-import { provideState, Store } from '@ngrx/store';
-import { groceryReducer } from '../store/reducers/grocery.reducer';
-import { map, Observable, of, combineLatest, startWith } from 'rxjs';
+import { Store } from '@ngrx/store';
 import { addIcons } from 'ionicons';
 import { remove, add, cart, trash, search, location, chevronDown } from 'ionicons/icons';
 import { addToBucket, removeFromBucket } from '../store/actions/bucket.action';
@@ -13,7 +11,6 @@ import { Bucket } from '../models/bucket.model';
 import { decreaseQuantity, increaseQuantity, loadGroceries } from '../store/actions/grocery.action';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../common/api-service';
-import { HttpClientModule } from '@angular/common/http';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { LoggerService } from '../services/logger-service';
 import { ItemCardComponent } from "../item-card/item-card.component";
@@ -23,73 +20,33 @@ import { ItemCardComponent } from "../item-card/item-card.component";
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, IonButton, IonItem, IonIcon, IonInput, IonBadge, RouterLink, HttpClientModule, ItemCardComponent]
+  imports: [IonContent, CommonModule, IonButton, IonItem, IonIcon, IonInput, IonBadge, RouterLink, ItemCardComponent]
 })
 export class DashboardPage implements OnInit {
-  groceries$?: Observable<Grocery[]>
-  filteredGroceries$?: Observable<Grocery[]>
-  bucketCount$?: Observable<number>;
-  searchTerm: string = '';
-  selectedCategory: string = 'All';
+  groceries: Signal<Grocery[]> = signal<Grocery[]>([]);
+  bucketItems: Signal<Bucket[]> = signal([]);
+  bucketCount = computed(() => this.bucketItems().reduce((count, item) => count + item.quantity, 0));
+  searchTerm = signal('');
+  selectedCategory = signal('All');
+  filteredGroceries = computed(() => this.filterGroceries(this.groceries(), this.searchTerm(), this.selectedCategory()));
   categories: string[] = ['Vegetables', 'Fruits', 'Beverages', 'Dairy', 'Snacks'];
 
   constructor(private store: Store<{ groceries: Grocery[]; myBucket: Bucket[] }>, private apiService: ApiService, private logger: LoggerService) {
     addIcons({location,chevronDown,search,remove,trash,add,cart});
+    this.groceries = toSignal(this.store.select('groceries'), { initialValue: [] });
+    this.bucketItems = toSignal(this.store.select('myBucket'), { initialValue: [] });
   }
 
   ngOnInit() {
     this.store.dispatch(loadGroceries());
-    this.groceries$ = this.store.select("groceries");
-    this.bucketCount$ = this.store.select("myBucket").pipe(
-      map(items => items ? items.reduce((count, item) => count + item.quantity, 0) : 0)
-    );
-
-    // Create filtered groceries observable
-    this.filteredGroceries$ = combineLatest([
-      this.groceries$.pipe(startWith([])),
-      of(this.searchTerm).pipe(startWith('')),
-      of(this.selectedCategory).pipe(startWith('All'))
-    ]).pipe(
-      map(([groceries, search, category]) => this.filterGroceries(groceries, search, category))
-    );
-
-    // this.apiService.getData("/api/products").subscribe((res) => {
-    //   console.log(res);
-    //   this.groceries$ = of(res);
-    // })
-
-  //   this.groceries$ = this.apiService.getData("/api/products").pipe(
-  //   map((products: any[]) =>
-  //     products.map(({ _id, ...rest }) => ({
-  //       id: _id,
-  //       ...rest
-  //     }))
-  //   )
-  // );
-
-    // this.groceries$ = this.apiService.getData("/api/products").pipe(
-    //   map((res: any) => res.products || res)
-    // );
   }
 
   onSearchChange(event: any) {
-    this.searchTerm = event.target.value || '';
-    this.updateFilteredGroceries();
+    this.searchTerm.set(event.detail?.value ?? '');
   }
 
   setCategory(category: string) {
-    this.selectedCategory = category;
-    this.updateFilteredGroceries();
-  }
-
-  private updateFilteredGroceries() {
-    this.filteredGroceries$ = combineLatest([
-      this.groceries$!,
-      of(this.searchTerm),
-      of(this.selectedCategory)
-    ]).pipe(
-      map(([groceries, search, category]) => this.filterGroceries(groceries, search, category))
-    );
+    this.selectedCategory.set(category);
   }
 
   private filterGroceries(groceries: Grocery[], search: string, category: string): Grocery[] {

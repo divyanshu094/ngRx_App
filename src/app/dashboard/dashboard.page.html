@@ -14,7 +14,7 @@
         <ion-button routerLink="/cart" class="rounded-full bg-slate-900 px-4 py-3 text-white shadow-lg" fill="solid">
           <ion-icon slot="start" name="cart"></ion-icon>
           Cart
-          <ion-badge class="ml-2 bg-emerald-500 text-white">{{ (bucketCount$ | async) || 0 }}</ion-badge>
+          <ion-badge class="ml-2 bg-emerald-500 text-white">{{ bucketCount() }}</ion-badge>
         </ion-button>
         <ion-button fill="clear" class="text-emerald-600 font-medium" size="small">
           <ion-icon name="chevron-down" slot="end"></ion-icon>
@@ -39,7 +39,7 @@
       <ion-item class="rounded-full border border-slate-200 bg-white shadow-sm" fill="solid">
         <ion-icon name="search" slot="start" class="text-slate-400"></ion-icon>
         <ion-input
-          [(ngModel)]="searchTerm"
+          [value]="searchTerm()"
           placeholder="Search groceries..."
           class="text-slate-700"
           (ionInput)="onSearchChange($event)">
@@ -51,27 +51,27 @@
     <div class="mb-5 flex flex-wrap gap-2">
       <span
         class="cursor-pointer rounded-full px-4 py-2 text-sm font-medium shadow-sm transition-colors"
-        [class.bg-white]="selectedCategory === 'All'"
-        [class.text-slate-700]="selectedCategory === 'All'"
-        [class.bg-slate-100]="selectedCategory !== 'All'"
-        [class.text-slate-600]="selectedCategory !== 'All'"
+        [class.bg-white]="selectedCategory() === 'All'"
+        [class.text-slate-700]="selectedCategory() === 'All'"
+        [class.bg-slate-100]="selectedCategory() !== 'All'"
+        [class.text-slate-600]="selectedCategory() !== 'All'"
         (click)="setCategory('All')">
         All
       </span>
       <span
         *ngFor="let category of categories"
         class="cursor-pointer rounded-full px-4 py-2 text-sm shadow-sm transition-colors"
-        [class.bg-white]="selectedCategory === category"
-        [class.text-slate-700]="selectedCategory === category"
-        [class.bg-slate-100]="selectedCategory !== category"
-        [class.text-slate-600]="selectedCategory !== category"
+        [class.bg-white]="selectedCategory() === category"
+        [class.text-slate-700]="selectedCategory() === category"
+        [class.bg-slate-100]="selectedCategory() !== category"
+        [class.text-slate-600]="selectedCategory() !== category"
         (click)="setCategory(category)">
         {{ category }}
       </span>
     </div>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      @for (item of filteredGroceries$ | async; track item.id) {
+      @for (item of filteredGroceries() ; track item.id) {
       <app-item-card [item]="item"></app-item-card>
       }
     </div>
