@@ -4,12 +4,13 @@ import { Grocery } from '../models/grocery.model';
 import { increaseQuantity, decreaseQuantity } from '../store/actions/grocery.action';
 import { IonCard, IonCardContent, IonButton, IonIcon } from "@ionic/angular/standalone";
 import { addToBucket, removeFromBucket } from '../store/actions/bucket.action';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-item-card',
   templateUrl: './item-card.component.html',
   styleUrls: ['./item-card.component.scss'],
-  imports: [IonIcon, IonButton, IonCard, IonCardContent],
+  imports: [IonIcon, IonButton, IonCard, IonCardContent,CurrencyPipe],
 })
 export class ItemCardComponent implements OnInit {
 

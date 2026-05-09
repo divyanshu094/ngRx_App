@@ -1,29 +1,37 @@
-<ion-content fullscreen class="ion-padding pb-6">
-  <div class="mx-auto max-w-6xl px-4">
-    <div class="mb-6 flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-sm border border-slate-200/80 md:flex-row md:items-center md:justify-between">
+<ion-content fullscreen>
+  <div class="mx-auto max-w-6xl px-2 bg-orange-300 py-3 h-screen overflow-auto">
+    <div
+      class="mb-3 flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-sm border border-slate-200/80 md:flex-row md:items-center md:justify-between"
+    >
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+        <div
+          class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center"
+        >
           <ion-icon name="location" class="text-emerald-600 text-xl"></ion-icon>
         </div>
         <div>
-          <p class="text-xs text-slate-500 uppercase tracking-wide">Delivering to</p>
-          <p class="text-sm font-semibold text-slate-900">Home - 123 Main Street, Mumbai</p>
+          <p class="text-xs text-slate-500 uppercase tracking-wide">
+            Delivering to
+          </p>
+          <p class="text-sm font-semibold text-slate-900">
+            Home - 123 Main Street, Mumbai
+            <ion-icon name="chevron-down" slot="end"></ion-icon>
+          </p>
         </div>
       </div>
-      <div class="flex flex-wrap items-center gap-3 justify-between md:justify-end">
-        <ion-button routerLink="/cart" class="rounded-full bg-slate-900 px-4 py-3 text-white shadow-lg" fill="solid">
+      <!-- <div class="flex flex-wrap items-center gap-3 justify-between md:justify-end"> -->
+      <!-- <ion-button routerLink="/cart" class="rounded-full px-4 py-3 text-white" fill="solid">
           <ion-icon slot="start" name="cart"></ion-icon>
-          Cart
-          <ion-badge class="ml-2 bg-emerald-500 text-white">{{ bucketCount() }}</ion-badge>
-        </ion-button>
-        <ion-button fill="clear" class="text-emerald-600 font-medium" size="small">
+          <ion-badge class="ml-2 bg-emerald-500 text-white" class="badge-overlay">{{ bucketCount() }}</ion-badge>
+        </ion-button> -->
+      <!-- <ion-button fill="clear" class="text-emerald-600 font-medium" size="small">
           <ion-icon name="chevron-down" slot="end"></ion-icon>
           Change
-        </ion-button>
-      </div>
+        </ion-button> -->
+      <!-- </div> -->
     </div>
 
-    <section class="rounded-[2rem] bg-gradient-to-br from-brand-600 via-brand-500 to-emerald-500 p-6 shadow-soft text-white mb-6">
+    <!-- <section class="rounded-[2rem] bg-gradient-to-br from-brand-600 via-brand-500 to-emerald-500 p-6 shadow-soft text-white mb-6">
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <p class="text-sm uppercase tracking-[0.3em] opacity-90">Grocery delivery</p>
@@ -32,45 +40,58 @@
         </div>
         <ion-button routerLink="/cart" class="rounded-full bg-white px-5 py-3 text-emerald-700 font-semibold shadow-lg" fill="solid">View Cart</ion-button>
       </div>
-    </section>
+    </section> -->
 
     <!-- Search Bar -->
-    <div class="mb-6">
-      <ion-item class="rounded-full border border-slate-200 bg-white shadow-sm" fill="solid">
+    <div class="mb-1">
+      <ion-item
+        class="rounded-[0.5rem] border border-slate-200 bg-white shadow-sm"
+        fill="solid"
+      >
         <ion-icon name="search" slot="start" class="text-slate-400"></ion-icon>
         <ion-input
           [value]="searchTerm()"
           placeholder="Search groceries..."
           class="text-slate-700"
-          (ionInput)="onSearchChange($event)">
+          (ionInput)="onSearchChange($event)"
+        >
         </ion-input>
       </ion-item>
     </div>
 
     <!-- Category Filters -->
-    <div class="mb-5 flex flex-wrap gap-2">
-      <span
-        class="cursor-pointer rounded-full px-4 py-2 text-sm font-medium shadow-sm transition-colors"
-        [class.bg-white]="selectedCategory() === 'All'"
-        [class.text-slate-700]="selectedCategory() === 'All'"
-        [class.bg-slate-100]="selectedCategory() !== 'All'"
-        [class.text-slate-600]="selectedCategory() !== 'All'"
-        (click)="setCategory('All')">
-        All
-      </span>
-      <span
-        *ngFor="let category of categories"
-        class="cursor-pointer rounded-full px-4 py-2 text-sm shadow-sm transition-colors"
-        [class.bg-white]="selectedCategory() === category"
-        [class.text-slate-700]="selectedCategory() === category"
-        [class.bg-slate-100]="selectedCategory() !== category"
-        [class.text-slate-600]="selectedCategory() !== category"
-        (click)="setCategory(category)">
-        {{ category }}
-      </span>
+    <!-- <div class="rounded-[0.5rem] px-2 py-3 overflow-x-auto scrollbar-hide"> -->
+      <div class="px-2 py-2 overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-hide">
+      <div class="flex gap-4 w-max">
+        @for (category of categories; track category.id) {
+        <div
+          class="flex flex-col items-center min-w-[70px] relative"
+          (click)="setCategory(category.name)"
+        >
+          <div
+            class="w-14 h-14 flex items-center justify-center overflow-hidden"
+          >
+            <img
+              [src]="category.image"
+              [alt]="category.name"
+              class="w-10 h-10 object-contain"
+            />
+          </div>
+
+          <p
+            class="mt-2 text-[15px] font-semibold text-black whitespace-nowrap"
+          >
+            {{ category.name }}
+          </p>
+          @if (selectedCategory() === category.name) {
+          <div class="absolute -bottom-2 w-12 h-1 bg-black rounded-full"></div>
+          }
+        </div>
+        }
+      </div>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 pt-2">
       @for (item of filteredGroceries() ; track item.id) {
       <app-item-card [item]="item"></app-item-card>
       }
