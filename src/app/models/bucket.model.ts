@@ -3,4 +3,7 @@ export interface Bucket{
     name:string;
     type:string;
     quantity:number;
+    price?: number;
+    image?: string;
+    description?: string;
 }

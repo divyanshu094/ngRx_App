@@ -1,34 +1,32 @@
-<ion-card class="product-card">
-
-  <div class="image-wrapper">
-    <img [src]="item.image || './assets/icon/favicon.png'" />
+<ion-card class="product-card rounded-[1.8rem] border-0 bg-white shadow-soft transition-transform duration-200 hover:-translate-y-1">
+  <div class="image-wrapper bg-slate-50 p-5 rounded-t-[1.8rem] flex items-center justify-center">
+    <img [src]="item.image || './assets/icon/favicon.png'" alt="{{ item.name }}" class="h-32 object-contain" />
   </div>
 
-  <ion-card-content>
-    <h2 class="title">{{ item.name }}</h2>
-    <p class="description">{{ item.description }}</p>
-    <div class="price">
-      ₹{{ item.price }}
+  <ion-card-content class="space-y-4 px-5 pb-5 pt-4">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="title text-lg font-semibold text-slate-900">{{ item.name }}</h2>
+      <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Fresh</span>
     </div>
-    <div class="bottom-row">
 
+    <p class="description text-sm text-slate-500">{{ item.description }}</p>
+
+    <div class="flex items-center justify-between gap-4">
+      <div class="price text-xl font-bold text-emerald-600">₹{{ item.price }}</div>
       @if (item.quantity > 0) {
-      <div class="quantity-section">
-        <ion-button size="small" fill="clear" (click)="decrease(item)">
+      <div class="quantity-section inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2">
+        <ion-button size="small" fill="clear" class="text-slate-600" (click)="decrease(item)">
           <ion-icon name="remove"></ion-icon>
         </ion-button>
-
-        <span class="quantity">{{ item.quantity }}</span>
-
-        <ion-button size="small" fill="clear" (click)="increase(item)">
+        <span class="quantity text-sm font-semibold">{{ item.quantity }}</span>
+        <ion-button size="small" fill="clear" class="text-slate-600" (click)="increase(item)">
           <ion-icon name="add"></ion-icon>
         </ion-button>
       </div>
       }
       @else {
-      <ion-button expand="block" (click)="increase(item)">Add</ion-button>
+      <ion-button expand="block" class="rounded-full bg-emerald-600 px-4 py-3 text-white font-semibold" (click)="increase(item)">Add</ion-button>
       }
     </div>
   </ion-card-content>
-
 </ion-card>

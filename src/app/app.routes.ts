@@ -23,7 +23,11 @@ export const routes: Routes = [
     loadComponent: () => import('./register/register.page').then( m => m.RegisterPage)
   },
   {
+    path: 'checkout',
+    loadComponent: () => import('./checkout/checkout.page').then( m => m.CheckoutPage)
+  },
+  {
     path: '**',
     redirectTo: 'login'
-  },
+  }
 ];

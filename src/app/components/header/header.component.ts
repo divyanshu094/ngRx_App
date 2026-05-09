@@ -12,8 +12,7 @@ import { Bucket } from 'src/app/models/bucket.model';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true, // Mark as standalone
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonCol, IonGrid, IonRow, IonButton,
-    IonButtons, IonInput, IonIcon, IonBadge, CommonModule, RouterLink]
+  imports: [IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonIcon, IonBadge, CommonModule, RouterLink]
 })
 export class HeaderComponent implements OnInit {
   @Input() title: string = 'Default Title';

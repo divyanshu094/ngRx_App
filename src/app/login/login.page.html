@@ -1,13 +1,67 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>login</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content fullscreen class="bg-gradient-to-br from-emerald-50 via-white to-slate-50">
+  <div class="flex min-h-screen flex-col items-center justify-center px-6 py-12">
+    <!-- Logo/Brand Section -->
+    <div class="mb-8 text-center">
+      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg">
+        <ion-icon name="leaf" class="text-2xl text-white"></ion-icon>
+      </div>
+      <h1 class="text-4xl font-bold text-slate-900">ShopZepto</h1>
+      <p class="mt-2 text-slate-600">Fresh groceries, delivered fast</p>
+    </div>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">login</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <!-- Login Card -->
+    <div class="w-full max-w-md">
+      <div class="rounded-[2.5rem] bg-white/80 p-8 shadow-2xl backdrop-blur-xl border border-white/20">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-slate-900">Welcome back</h2>
+          <p class="mt-3 text-slate-600">Sign in to your account to continue shopping</p>
+        </div>
+
+        <form class="space-y-6">
+          <div>
+            <ion-item class="rounded-2xl border border-slate-200 bg-slate-50/50" fill="solid" lines="none">
+              <ion-icon name="mail" slot="start" class="text-slate-400"></ion-icon>
+              <ion-label position="floating" class="text-slate-700 font-medium">Email address</ion-label>
+              <ion-input type="email" placeholder="Enter your email"></ion-input>
+            </ion-item>
+          </div>
+
+          <div>
+            <ion-item class="rounded-2xl border border-slate-200 bg-slate-50/50" fill="solid" lines="none">
+              <ion-icon name="lock-closed" slot="start" class="text-slate-400"></ion-icon>
+              <ion-label position="floating" class="text-slate-700 font-medium">Password</ion-label>
+              <ion-input type="password" placeholder="Enter your password"></ion-input>
+            </ion-item>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <ion-item lines="none" class="bg-transparent">
+              <ion-checkbox slot="start" class="text-emerald-600"></ion-checkbox>
+              <ion-label class="text-sm text-slate-600">Remember me</ion-label>
+            </ion-item>
+            <a href="#" class="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Forgot password?</a>
+          </div>
+
+          <ion-button expand="block" class="mt-8 h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200" fill="solid">
+            <ion-icon name="log-in" slot="start"></ion-icon>
+            Sign In
+          </ion-button>
+        </form>
+
+        <div class="mt-8 text-center">
+          <p class="text-slate-600">
+            Don't have an account?
+            <a routerLink="/register" class="text-emerald-600 hover:text-emerald-700 font-semibold ml-1">Sign up</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom decorative elements -->
+    <div class="mt-12 flex space-x-2">
+      <div class="h-2 w-2 rounded-full bg-emerald-200"></div>
+      <div class="h-2 w-8 rounded-full bg-emerald-400"></div>
+      <div class="h-2 w-2 rounded-full bg-emerald-200"></div>
+    </div>
+  </div>
 </ion-content>
