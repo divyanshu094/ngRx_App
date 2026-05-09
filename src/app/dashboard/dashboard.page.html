@@ -9,7 +9,7 @@
         >
           <ion-icon name="location" class="text-emerald-600 text-xl"></ion-icon>
         </div>
-        <div>
+        <div routerLink="/address" class="cursor-pointer">
           <p class="text-xs text-slate-500 uppercase tracking-wide">
             Delivering to
           </p>
@@ -19,16 +19,6 @@
           </p>
         </div>
       </div>
-      <!-- <div class="flex flex-wrap items-center gap-3 justify-between md:justify-end"> -->
-      <!-- <ion-button routerLink="/cart" class="rounded-full px-4 py-3 text-white" fill="solid">
-          <ion-icon slot="start" name="cart"></ion-icon>
-          <ion-badge class="ml-2 bg-emerald-500 text-white" class="badge-overlay">{{ bucketCount() }}</ion-badge>
-        </ion-button> -->
-      <!-- <ion-button fill="clear" class="text-emerald-600 font-medium" size="small">
-          <ion-icon name="chevron-down" slot="end"></ion-icon>
-          Change
-        </ion-button> -->
-      <!-- </div> -->
     </div>
 
     <!-- <section class="rounded-[2rem] bg-gradient-to-br from-brand-600 via-brand-500 to-emerald-500 p-6 shadow-soft text-white mb-6">
@@ -60,7 +50,6 @@
     </div>
 
     <!-- Category Filters -->
-    <!-- <div class="rounded-[0.5rem] px-2 py-3 overflow-x-auto scrollbar-hide"> -->
       <div class="px-2 py-2 overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-hide">
       <div class="flex gap-4 w-max">
         @for (category of categories; track category.id) {
@@ -97,4 +86,46 @@
       }
     </div>
   </div>
+
+  @if (bucketCount() > 0) {
+
+  <div
+    class="fixed bottom-4 left-1/2 z-50 w-[92%] max-w-md -translate-x-1/2">
+
+    <div
+      class="flex items-center justify-between rounded-2xl bg-pink-300 px-4 py-3 shadow-2xl">
+
+      <!-- Left -->
+      <div class="flex flex-col">
+
+        <span class="text-sm font-semibold text-black">
+          {{ bucketCount() }} items added
+        </span>
+
+        <span class="text-xs text-black">
+          Ready to checkout
+        </span>
+
+      </div>
+
+      <!-- Right -->
+      <ion-button
+        routerLink="/cart"
+        color="light"
+        class="cart-btn m-0">
+
+        <ion-icon
+          slot="start"
+          name="cart">
+        </ion-icon>
+
+        View Cart
+
+      </ion-button>
+
+    </div>
+
+  </div>
+
+}
 </ion-content>

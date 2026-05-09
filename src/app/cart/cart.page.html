@@ -1,5 +1,5 @@
-<ion-content fullscreen class="ion-padding pb-6">
-  <div class="mx-auto max-w-4xl px-4">
+<ion-content fullscreen>
+  <div class="mx-auto max-w-4xl px-4 bg-orange-300 py-3 h-screen overflow-auto">
     <!-- Cart Header -->
     <div class="mb-6">
       <div class="flex items-center gap-3 mb-4">
@@ -10,31 +10,120 @@
       </div>
     </div>
 
-    @if ((bucket$ | async); as bucketItems) {
-    @if (bucketItems.length > 0) {
-    @for (item of bucketItems; track item.id) {
-    <ion-card class="mb-4 rounded-[1.8rem] border border-slate-200/80 bg-white shadow-sm">
-      <ion-item lines="none" class="ion-no-padding ion-align-items-center">
-        <img slot="start" [src]="item.image || './assets/icon/favicon.png'" alt="{{ item.name }}" class="h-16 w-16 rounded-3xl object-cover" />
-        <ion-label class="pl-3">
-          <h3 class="text-base font-semibold text-slate-900">{{ item.name }}</h3>
-          <p class="text-sm text-slate-500">Qty {{ item.quantity }}</p>
-        </ion-label>
-        <div class="quantity-controls ml-auto inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2">
-          <ion-button size="small" fill="clear" class="text-slate-600" (click)="decrement(item)">
-            <ion-icon name="remove"></ion-icon>
-          </ion-button>
-          <span class="text-sm font-semibold">{{ item.quantity }}</span>
-          <ion-button size="small" fill="clear" class="text-slate-600" (click)="increment(item)">
-            <ion-icon name="add"></ion-icon>
-          </ion-button>
+    @if ((bucket$ | async); as bucketItems) { @if (bucketItems.length > 0) {
+    <div
+      class="mb-6 rounded-[0.5rem] border border-slate-200/80 bg-white shadow-sm space-y-4 pb-1"
+    >
+      @for (item of bucketItems; track item.id) {
+      <ion-card class="border border-slate-200/80 bg-white shadow-sm p-1">
+        <ion-item lines="none" class="ion-no-padding ion-align-items-center">
+          <img
+            slot="start"
+            [src]="item.image || './assets/icon/favicon.png'"
+            alt="{{ item.name }}"
+            class="h-16 w-16 rounded-3xl object-cover"
+          />
+          <ion-label class="pl-3">
+            <h3 class="text-base font-semibold text-slate-900">
+              {{ item.name }}
+            </h3>
+            <p class="text-sm text-slate-500">Qty {{ item.quantity }}</p>
+          </ion-label>
+          <div
+            class="flex h-9 items-center justify-between rounded-[0.5rem] border border-pink-500 bg-pink-700 px-2 shadow-sm"
+          >
+            <button
+              class="px-2 text-lg font-bold text-white"
+              (click)="decrement(item)"
+            >
+              <ion-icon name="remove" class="text-white text-xl stroke-[48]" />
+            </button>
+
+            <span
+              class="min-w-[20px] text-center text-[14px] font-bold text-white"
+            >
+              {{ item.quantity }}
+            </span>
+
+            <button
+              class="px-2 text-lg font-bold text-white"
+              (click)="increment(item)"
+            >
+              <ion-icon name="add" class="text-white text-xl stroke-[48]" />
+            </button>
+          </div>
+        </ion-item>
+      </ion-card>
+      }
+    </div>
+
+    <!-- Order Summary Sidebar -->
+    <div class="lg:col-span-1">
+      <div
+        class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200/80 sticky top-6"
+      >
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Order Summary</h3>
+
+        <!-- Cart Items -->
+        <div class="space-y-3 mb-6 max-h-64 overflow-y-auto">
+          @for (item of bucket$ | async; track item.id) {
+          <div class="flex items-center gap-3 py-2">
+            <img
+              [src]="item.image || './assets/icon/favicon.png'"
+              alt="{{ item.name }}"
+              class="w-12 h-12 rounded-xl object-cover"
+            />
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-slate-900 truncate">
+                {{ item.name }}
+              </p>
+              <p class="text-xs text-slate-500">Qty: {{ item.quantity }}</p>
+            </div>
+            <p class="text-sm font-semibold text-slate-900">
+              ₹{{ (item.price || 0) * item.quantity }}
+            </p>
+          </div>
+          }
         </div>
-      </ion-item>
-    </ion-card>
-    }
+
+        <!-- Price Breakdown -->
+        <div class="border-t border-slate-800 pt-4 space-y-2">
+          @if ((bucket$ | async); as items) {
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-600">Subtotal</span>
+            <span class="text-slate-900 font-medium"
+              >₹{{ getTotalPrice(items) }}</span
+            >
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-600">Delivery Fee</span>
+            <span class="text-slate-900 font-medium"
+              >₹{{ getDeliveryFee() }}</span
+            >
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-600">GST (5%)</span>
+            <span class="text-slate-900 font-medium">₹{{ getGST(items) }}</span>
+          </div>
+          <div
+            class="flex justify-between text-lg font-semibold pt-2 border-t border-slate-400"
+          >
+            <span class="text-slate-900">Total</span>
+            <span class="text-emerald-600">₹{{ getGrandTotal(items) }}</span>
+          </div>
+          }
+        </div>
+
+        <p class="text-xs text-slate-500 text-center mt-3">
+          By placing order, you agree to our Terms & Conditions
+        </p>
+      </div>
+    </div>
 
     <!-- Checkout Section -->
-    <div class="mt-8 bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200/80">
+    <!-- <div
+      class="mt-8 bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200/80"
+    >
       <div class="flex justify-between items-center mb-4">
         <span class="text-lg font-semibold text-slate-900">Total</span>
         <span class="text-2xl font-bold text-emerald-600">
@@ -45,18 +134,33 @@
         expand="block"
         routerLink="/checkout"
         class="h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-lg shadow-lg"
-        fill="solid">
+        fill="solid"
+      >
         <ion-icon name="bag-check" slot="start"></ion-icon>
         Proceed to Checkout
       </ion-button>
-    </div>
+    </div> -->
+    <div class="fixed bottom-0 left-0 right-0">
+      <div
+        class="flex items-center justify-between rounded-2xl bg-transparent px-4 py-3 shadow-2xl"
+      >
+        <!-- Left -->
+        <div class="flex flex-col">
+          <span class="text-sm font-semibold text-black"> Home </span>
 
-    }
-    @else {
-    <div class="rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600">
+          <span class="text-xs text-black"> Ready to checkout </span>
+        </div>
+
+        <!-- Right -->
+        <ion-button  fill="solid" color="primary"> Pay Now </ion-button>
+      </div>
+    </div>
+    } @else {
+    <div
+      class="rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600"
+    >
       Your cart is empty. Add fresh groceries to continue.
     </div>
-    }
-    }
+    } }
   </div>
 </ion-content>

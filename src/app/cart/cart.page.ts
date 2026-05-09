@@ -35,6 +35,18 @@ export class CartPage implements OnInit {
     return items.reduce((total, item) => total + ((item.price || 0) * item.quantity), 0);
   }
 
+  getDeliveryFee(): number {
+    return 29; // ₹29 delivery fee like Zepto
+  }
+
+  getGST(items: Bucket[]): number {
+    return Math.round(this.getTotalPrice(items) * 0.05); // 5% GST
+  }
+
+  getGrandTotal(items: Bucket[]): number {
+    return this.getTotalPrice(items) + this.getDeliveryFee() + this.getGST(items);
+  }
+
   increment(item: Bucket) {
     const payload: Bucket = {
       id: item.id,

@@ -1,0 +1,78 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Saved Addresses</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleAddForm()">
+        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="address-content">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Saved Addresses</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="address-summary">
+    <p *ngIf="savedAddresses.length === 0" class="empty-state">
+      No saved addresses yet. Tap + to add your first address.
+    </p>
+    <ion-card *ngFor="let address of savedAddresses" class="address-card">
+      <ion-card-header>
+        <ion-card-subtitle>{{ address.label || 'Home' }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>House / Building:</strong> {{ address.house }}</p>
+        <p><strong>Landmark:</strong> {{ address.landmark || 'None' }}</p>
+        <p><strong>Location:</strong> {{ address.locationLabel }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <div class="form-container" *ngIf="showAddForm">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Add new address</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item>
+            <ion-label position="stacked">House No. / Building</ion-label>
+            <ion-input [(ngModel)]="newAddress.house" placeholder="Enter house or building" required></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Landmark</ion-label>
+            <ion-input [(ngModel)]="newAddress.landmark" placeholder="Enter landmark"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Address Label</ion-label>
+            <ion-input [(ngModel)]="newAddress.label" placeholder="e.g. Home, Work"></ion-input>
+          </ion-item>
+        </ion-list>
+
+        <div class="map-card">
+          <div class="map-header">
+            <span>Choose location on map</span>
+            <span class="location-value" *ngIf="selectedLocation">{{ selectedLocation }}</span>
+          </div>
+          <div class="map-placeholder" (click)="chooseLocation($event)">
+            <div class="map-overlay">
+              <p>Tap to select location</p>
+              <p class="map-hint">Latitude / longitude are generated from the tapped point.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <ion-button expand="block" color="primary" (click)="saveAddress()" [disabled]="!isFormValid()">Save Address</ion-button>
+          <ion-button expand="block" fill="outline" color="medium" (click)="cancelForm()">Cancel</ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

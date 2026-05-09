@@ -7,9 +7,6 @@ import {
   IonButton,
   IonInput,
   IonIcon,
-  IonBadge,
-  IonChip,
-  IonLabel,
 } from '@ionic/angular/standalone';
 import { Grocery } from '../models/grocery.model';
 import { Store } from '@ngrx/store';
@@ -42,17 +39,14 @@ import { ItemCardComponent } from '../item-card/item-card.component';
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
   imports: [
-    IonChip,
     IonContent,
     CommonModule,
     IonButton,
     IonItem,
     IonIcon,
     IonInput,
-    IonBadge,
     RouterLink,
     ItemCardComponent,
-    IonLabel,
   ],
 })
 export class DashboardPage implements OnInit {

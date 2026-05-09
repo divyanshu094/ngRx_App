@@ -1,0 +1,79 @@
+.address-content {
+  padding: 0 16px 16px;
+}
+
+.address-summary {
+  margin-top: 16px;
+}
+
+.empty-state {
+  color: var(--ion-color-medium);
+  margin: 24px 0;
+  text-align: center;
+}
+
+.address-card {
+  margin-bottom: 16px;
+}
+
+.form-container {
+  margin-top: 20px;
+}
+
+.map-card {
+  margin-top: 16px;
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.location-value {
+  color: var(--ion-color-primary);
+  font-weight: 600;
+}
+
+.map-placeholder {
+  min-height: 200px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e8f0ff 0%, #f8fbff 100%);
+  border: 1px solid var(--ion-color-light);
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.map-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 50% 50%, rgba(0, 80, 255, 0.18) 0%, transparent 40%);
+}
+
+.map-overlay {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: var(--ion-color-dark);
+}
+
+.map-overlay p {
+  margin: 0;
+}
+
+.map-hint {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+}
+
+.form-actions {
+  margin-top: 20px;
+}
