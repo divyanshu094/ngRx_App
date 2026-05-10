@@ -112,7 +112,7 @@ export class DashboardPage implements OnInit {
   }
 
   ngOnInit() {
-    // this.store.dispatch(loadGroceries());
+    this.store.dispatch(loadGroceries());
   }
 
   onSearchChange(event: any) {

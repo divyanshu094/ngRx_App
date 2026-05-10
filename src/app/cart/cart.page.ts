@@ -114,7 +114,7 @@ export class CartPage implements OnInit {
 
   async initiatePayment() {
     // const paymentService = inject(PaymentService);
-    const total = this.getGrandTotal((await this.bucket$?.toPromise()) || []);
-    this.paymentService.payNow(total);
+    // const total = this.getGrandTotal((await this.bucket$?.toPromise()) || []);
+    this.paymentService.payNow(500); // For testing, using a fixed amount of ₹500. Replace with 'total' for actual payment.
   }
 }
