@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { remove, add, cart, trash, arrowBack, bagCheck } from 'ionicons/icons';
 import {
   IonButton,
   IonButtons,
@@ -17,8 +18,10 @@ import {
   IonLabel,
   IonList,
   IonTitle,
-  IonToolbar
+  IonToolbar,
 } from '@ionic/angular/standalone';
+import { RouterLink } from '@angular/router';
+import { addIcons } from 'ionicons';
 
 interface AddressItem {
   house: string;
@@ -50,8 +53,9 @@ interface AddressItem {
     IonInput,
     IonIcon,
     CommonModule,
-    FormsModule
-  ]
+    FormsModule,
+    RouterLink,
+  ],
 })
 export class AddressPage implements OnInit {
   savedAddresses: AddressItem[] = [];
@@ -62,10 +66,12 @@ export class AddressPage implements OnInit {
     house: '',
     landmark: '',
     label: '',
-    locationLabel: 'Not selected'
+    locationLabel: 'Not selected',
   };
 
-  constructor() {}
+  constructor() {
+    addIcons({ arrowBack, remove, add, bagCheck, cart, trash });
+  }
 
   ngOnInit() {}
 
@@ -85,7 +91,7 @@ export class AddressPage implements OnInit {
       house: this.newAddress.house,
       landmark: this.newAddress.landmark,
       label: this.newAddress.label,
-      locationLabel: this.selectedLocation || 'Location not selected'
+      locationLabel: this.selectedLocation || 'Location not selected',
     };
 
     this.savedAddresses = [address, ...this.savedAddresses];
@@ -117,7 +123,7 @@ export class AddressPage implements OnInit {
       house: '',
       landmark: '',
       label: '',
-      locationLabel: 'Not selected'
+      locationLabel: 'Not selected',
     };
     this.selectedLocation = '';
   }

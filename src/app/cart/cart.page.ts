@@ -1,4 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  Signal,
+  computed,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -49,34 +57,32 @@ import { PaymentService } from '../services/payment.service';
   ],
 })
 export class CartPage implements OnInit {
-  bucket$?: Observable<Bucket[]>;
-  constructor(private store: Store<{ myBucket: Bucket[] }>,private paymentService: PaymentService) {
+  bucketItems: Signal<Bucket[]> = signal([]);
+  totalPrice = computed(() =>
+    this.bucketItems().reduce(
+      (total, item) => total + (item.price || 0) * item.quantity,
+      0,
+    ),
+  );
+  deliveryFee = signal(29); // ₹29 delivery fee like Zepto
+  gst = computed(() => Math.round(this.totalPrice() * 0.05)); // 5% GST
+  grandTotal = computed(
+    () => this.totalPrice() + this.deliveryFee() + this.gst(),
+  );
+  getFinalPrice = computed(() => this.grandTotal());
+  hasItems = computed(() => this.bucketItems().length > 0);
+  constructor(
+    private store: Store<{ myBucket: Bucket[] }>,
+    private paymentService: PaymentService,
+  ) {
     addIcons({ arrowBack, remove, add, bagCheck, cart, trash });
+    this.bucketItems = toSignal(this.store.select('myBucket'), {
+      initialValue: [],
+    });
   }
 
   ngOnInit() {
-    this.bucket$ = this.store.select('myBucket');
-  }
-
-  getTotalPrice(items: Bucket[]): number {
-    return items.reduce(
-      (total, item) => total + (item.price || 0) * item.quantity,
-      0,
-    );
-  }
-
-  getDeliveryFee(): number {
-    return 29; // ₹29 delivery fee like Zepto
-  }
-
-  getGST(items: Bucket[]): number {
-    return Math.round(this.getTotalPrice(items) * 0.05); // 5% GST
-  }
-
-  getGrandTotal(items: Bucket[]): number {
-    return (
-      this.getTotalPrice(items) + this.getDeliveryFee() + this.getGST(items)
-    );
+    // No need for ngOnInit since toSignal handles it
   }
 
   increment(item: Bucket) {
@@ -114,7 +120,7 @@ export class CartPage implements OnInit {
 
   async initiatePayment() {
     // const paymentService = inject(PaymentService);
-    // const total = this.getGrandTotal((await this.bucket$?.toPromise()) || []);
-    this.paymentService.payNow(500); // For testing, using a fixed amount of ₹500. Replace with 'total' for actual payment.
+    // const total = this.grandTotal();
+    this.paymentService.payNow(this.grandTotal()); // Using the computed grand total
   }
 }

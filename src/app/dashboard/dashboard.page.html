@@ -1,58 +1,81 @@
-<ion-content fullscreen>
-  <div class="mx-auto max-w-6xl px-2 bg-orange-300 py-3 h-screen overflow-auto">
+<ion-content [scrollEvents]="true" (ionScroll)="onScroll($event)">
+  <div class="mx-auto max-w-6xl bg-orange-300 min-h-screen">
+    <!-- STICKY SEARCH ONLY -->
     <div
-      class="mb-3 flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-sm border border-slate-200/80 md:flex-row md:items-center md:justify-between"
+      class="sticky top-0 z-50 bg-orange-300/95 backdrop-blur-md px-2 pt-3 pb-2"
     >
-      <div class="flex items-center gap-3">
-        <div
-          class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center"
-        >
-          <ion-icon name="location" class="text-emerald-600 text-xl"></ion-icon>
-        </div>
-        <div routerLink="/address" class="cursor-pointer">
-          <p class="text-xs text-slate-500 uppercase tracking-wide">
-            Delivering to
-          </p>
-          <p class="text-sm font-semibold text-slate-900">
-            Home - 123 Main Street, Mumbai
-            <ion-icon name="chevron-down" slot="end"></ion-icon>
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- <section class="rounded-[2rem] bg-gradient-to-br from-brand-600 via-brand-500 to-emerald-500 p-6 shadow-soft text-white mb-6">
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p class="text-sm uppercase tracking-[0.3em] opacity-90">Grocery delivery</p>
-          <h1 class="mt-2 text-3xl font-extrabold leading-tight">Fresh groceries, delivered in minutes.</h1>
-          <p class="mt-3 max-w-xl text-slate-100/90">Shop fruits, veggies and pantry essentials with a clean, modern Zepto-style experience.</p>
-        </div>
-        <ion-button routerLink="/cart" class="rounded-full bg-white px-5 py-3 text-emerald-700 font-semibold shadow-lg" fill="solid">View Cart</ion-button>
-      </div>
-    </section> -->
-
-    <!-- Search Bar -->
-    <div class="mb-1">
-      <ion-item
-        class="rounded-[0.5rem] border border-slate-200 bg-white shadow-sm"
-        fill="solid"
+      <!-- LOCATION -->
+      <div
+        class="transition-all duration-300 overflow-hidden"
+        [class.max-h-0]="isScrolled()"
+        [class.opacity-0]="isScrolled()"
+        [class.mb-0]="isScrolled()"
+        [class.max-h-[120px]]="!isScrolled()"
+        [class.opacity-100]="!isScrolled()"
       >
-        <ion-icon name="search" slot="start" class="text-slate-400"></ion-icon>
-        <ion-input
-          [value]="searchTerm()"
-          placeholder="Search groceries..."
-          class="text-slate-700"
-          (ionInput)="onSearchChange($event)"
+        <div
+          class="mb-3 flex flex-col gap-4 rounded-2xl shadow-sm md:flex-row md:items-center md:justify-between"
         >
-        </ion-input>
-      </ion-item>
+          <div class="flex items-center gap-3">
+            <div
+              class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center"
+            >
+              <ion-icon
+                name="location"
+                class="text-emerald-600 text-xl"
+              ></ion-icon>
+            </div>
+
+            <div routerLink="/address" class="cursor-pointer">
+              <p class="font-bold text-black uppercase tracking-wide">
+                Delivering to
+              </p>
+
+              <p
+                class="text-sm font-semibold text-slate-900 flex items-center gap-1"
+              >
+                Home - 123 Main Street, Mumbai
+
+                <ion-icon name="chevron-down" class="text-sm"></ion-icon>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEARCH -->
+      <div
+        class="transition-all duration-300"
+        [class.scale-[0.98]]="isScrolled()"
+      >
+        <ion-item
+          class="rounded-xl border border-slate-200 bg-white shadow-sm"
+          fill="solid"
+        >
+          <ion-icon
+            name="search"
+            slot="start"
+            class="text-slate-400"
+          ></ion-icon>
+
+          <ion-input
+            [value]="searchTerm()"
+            placeholder="Search..."
+            class="text-slate-700"
+            (ionInput)="onSearchChange($event)"
+          >
+          </ion-input>
+        </ion-item>
+      </div>
     </div>
 
-    <!-- Category Filters -->
-      <div class="px-2 py-2 overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-hide">
+    <!-- CATEGORY FILTERS (NOT STICKY) -->
+    <div
+      class="px-2 py-2 overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-hide"
+    >
       <div class="flex gap-4 w-max">
         @for (category of categories; track category.id) {
+
         <div
           class="flex flex-col items-center min-w-[70px] relative"
           (click)="setCategory(category.name)"
@@ -72,60 +95,52 @@
           >
             {{ category.name }}
           </p>
+
           @if (selectedCategory() === category.name) {
+
           <div class="absolute -bottom-2 w-12 h-1 bg-black rounded-full"></div>
+
           }
         </div>
+
         }
       </div>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 pt-2">
-      @for (item of filteredGroceries() ; track item.id) {
+    <!-- PRODUCTS -->
+    <div
+      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-2 pb-32 mt-2"
+    >
+      @for (item of filteredGroceries(); track item.id) {
+
       <app-item-card [item]="item"></app-item-card>
+
       }
     </div>
   </div>
 
+  <!-- FLOATING CART -->
   @if (bucketCount() > 0) {
 
-  <div
-    class="fixed bottom-4 left-1/2 z-50 w-[92%] max-w-md -translate-x-1/2">
-
+  <div class="fixed bottom-4 left-1/2 z-50 w-[92%] max-w-md -translate-x-1/2">
     <div
-      class="flex items-center justify-between rounded-2xl bg-pink-300 px-4 py-3 shadow-2xl">
-
-      <!-- Left -->
+      class="flex items-center justify-between rounded-2xl bg-pink-300 px-4 py-3 shadow-2xl"
+    >
       <div class="flex flex-col">
-
         <span class="text-sm font-semibold text-black">
           {{ bucketCount() }} items added
         </span>
 
-        <span class="text-xs text-black">
-          Ready to checkout
-        </span>
-
+        <span class="text-xs text-black"> Ready to checkout </span>
       </div>
 
-      <!-- Right -->
-      <ion-button
-        routerLink="/cart"
-        color="light"
-        class="cart-btn m-0">
-
-        <ion-icon
-          slot="start"
-          name="cart">
-        </ion-icon>
+      <ion-button routerLink="/cart" color="light" class="cart-btn m-0">
+        <ion-icon slot="start" name="cart"></ion-icon>
 
         View Cart
-
       </ion-button>
-
     </div>
-
   </div>
 
-}
+  }
 </ion-content>

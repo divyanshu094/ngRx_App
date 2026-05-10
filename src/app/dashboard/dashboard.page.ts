@@ -50,6 +50,7 @@ import { ItemCardComponent } from '../item-card/item-card.component';
   ],
 })
 export class DashboardPage implements OnInit {
+  isScrolled = signal(false);
   groceries: Signal<Grocery[]> = signal<Grocery[]>([]);
   bucketItems: Signal<Bucket[]> = signal([]);
   bucketCount = computed(() =>
@@ -113,6 +114,11 @@ export class DashboardPage implements OnInit {
 
   ngOnInit() {
     this.store.dispatch(loadGroceries());
+  }
+
+  onScroll(event: any) {
+    const scrollTop = event.detail.scrollTop;
+    this.isScrolled.set(scrollTop > 40);
   }
 
   onSearchChange(event: any) {
