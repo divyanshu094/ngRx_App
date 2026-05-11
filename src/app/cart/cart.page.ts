@@ -121,6 +121,7 @@ export class CartPage implements OnInit {
   async initiatePayment() {
     // const paymentService = inject(PaymentService);
     // const total = this.grandTotal();
-    this.paymentService.payNow(this.grandTotal()); // Using the computed grand total
+    // this.paymentService.payNow(this.grandTotal()); // Using the computed grand total
+    this.paymentService.payViaUPI('phonepe');
   }
 }

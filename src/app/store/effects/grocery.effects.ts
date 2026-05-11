@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { loadGroceries, loadGroceriesSuccess, loadGroceriesFailure } from '../actions/grocery.action';
 import { catchError, map, switchMap, of } from 'rxjs';
-import { ApiService } from 'src/app/common/api-service';
+import { ApiService } from 'src/app/services/api-service/api-service';
 
 @Injectable()
 export class GroceryEffects {

@@ -1,85 +1,195 @@
-<ion-content fullscreen class="bg-gradient-to-br from-emerald-50 via-white to-slate-50">
-  <div class="flex min-h-screen flex-col items-center justify-center px-6 py-12">
-    <!-- Logo/Brand Section -->
-    <div class="mb-8 text-center">
-      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg">
-        <ion-icon name="leaf" class="text-2xl text-white"></ion-icon>
-      </div>
-      <h1 class="text-4xl font-bold text-slate-900">ShopZepto</h1>
-      <p class="mt-2 text-slate-600">Fresh groceries, delivered fast</p>
-    </div>
-
-    <!-- Register Card -->
-    <div class="w-full max-w-md">
-      <div class="rounded-[2.5rem] bg-white/80 p-8 shadow-2xl backdrop-blur-xl border border-white/20">
-        <div class="text-center mb-8">
-          <h2 class="text-3xl font-bold text-slate-900">Join us today</h2>
-          <p class="mt-3 text-slate-600">Create your account and start shopping fresh groceries</p>
+<ion-content fullscreen class="bg-[#f88b8b]">
+  <div class="min-h-screen w-full flex items-center justify-center">
+    <!-- Phone Mock Layout -->
+    <div
+      class="relative w-full h-screen bg-[#f5f5f5] overflow-auto shadow-2xl rounded-none md:rounded-[40px]"
+    >
+      <!-- Top Section -->
+      <div class="relative h-[320px] bg-[#f88c8c] overflow-hidden">
+        <div class="absolute inset-0 opacity-25">
+          <div
+            class="absolute w-40 h-40 border border-white rounded-full top-4 left-4"
+          ></div>
+          <div
+            class="absolute w-28 h-28 border border-white rounded-full top-20 left-20"
+          ></div>
+          <div
+            class="absolute w-56 h-56 border border-white rounded-full top-10 right-[-80px]"
+          ></div>
         </div>
 
-        <form class="space-y-6">
+        <!-- brand name section -->
+        <div class="mb-8 text-left relative z-10 px-7 pt-16">
+          <!-- <div
+            class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg"
+          >
+            <ion-icon name="leaf" class="text-2xl text-white"></ion-icon>
+          </div> -->
+          <h1 class="text-4xl font-bold text-slate-900">Softiqo</h1>
+          <p class="mt-2 text-slate-600">Fresh groceries, delivered fast</p>
+        </div>
+
+        <!-- Wave -->
+        <div class="absolute bottom-0 left-0 w-full">
+          <svg
+            viewBox="0 0 500 150"
+            preserveAspectRatio="none"
+            class="w-full h-24"
+          >
+            <path
+              d="M0.00,49.98 C150.00,150.00 349.20,-50.00 500.00,49.98 L500.00,150.00 L0.00,150.00 Z"
+              class="fill-[#f5f5f5]"
+            ></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Form Section -->
+      <div class="px-7 pb-10 -mt-10 relative z-10">
+        <!-- Title -->
+        <h1 class="text-4xl font-bold text-gray-800">
+          Sign <span class="underline decoration-[#ff8f8f]">Up</span>
+        </h1>
+
+        <!-- Form -->
+        <form class="mt-10 space-y-6">
+          <!-- Name -->
           <div>
-            <ion-item class="rounded-2xl border border-slate-200 bg-slate-50/50" fill="solid" lines="none">
-              <ion-icon name="person" slot="start" class="text-slate-400"></ion-icon>
-              <ion-label position="floating" class="text-slate-700 font-medium">Full name</ion-label>
-              <ion-input type="text" placeholder="Enter your full name"></ion-input>
-            </ion-item>
-          </div>
+            <label class="text-black text-s font-semibold"> Name </label>
 
+            <div class="flex items-center border-b border-pink-200 py-2">
+              <ion-icon
+                name="person-outline"
+                class="text-gray-800 text-xl mr-2"
+              ></ion-icon>
+
+              <input
+                type="text"
+                placeholder="John Doe"
+                class="w-full outline-none bg-transparent"
+              />
+            </div>
+          </div>
+          <!-- Email -->
           <div>
-            <ion-item class="rounded-2xl border border-slate-200 bg-slate-50/50" fill="solid" lines="none">
-              <ion-icon name="mail" slot="start" class="text-slate-400"></ion-icon>
-              <ion-label position="floating" class="text-slate-700 font-medium">Email address</ion-label>
-              <ion-input type="email" placeholder="Enter your email"></ion-input>
-            </ion-item>
+            <label class="text-black text-s font-semibold"> Email </label>
+
+            <div class="flex items-center border-b border-pink-200 py-2">
+              <ion-icon
+                name="mail-outline"
+                class="text-gray-800 text-xl mr-2"
+              ></ion-icon>
+
+              <input
+                type="email"
+                placeholder="demo@email.com"
+                class="w-full outline-none bg-transparent"
+              />
+            </div>
           </div>
 
+          <!-- phone -->
           <div>
-            <ion-item class="rounded-2xl border border-slate-200 bg-slate-50/50" fill="solid" lines="none">
-              <ion-icon name="lock-closed" slot="start" class="text-slate-400"></ion-icon>
-              <ion-label position="floating" class="text-slate-700 font-medium">Password</ion-label>
-              <ion-input type="password" placeholder="Create a password"></ion-input>
-            </ion-item>
+            <label class="text-black text-s font-semibold"> Phone </label>
+
+            <div class="flex items-center border-b border-pink-200 py-2">
+              <ion-icon
+                name="call-outline"
+                class="text-gray-800 text-xl mr-2"
+              ></ion-icon>
+
+              <input
+                type="tel"
+                placeholder="Enter your phone number"
+                class="w-full outline-none bg-transparent"
+              />
+            </div>
           </div>
 
+          <!-- Password -->
           <div>
-            <ion-item class="rounded-2xl border border-slate-200 bg-slate-50/50" fill="solid" lines="none">
-              <ion-icon name="shield-checkmark" slot="start" class="text-slate-400"></ion-icon>
-              <ion-label position="floating" class="text-slate-700 font-medium">Confirm password</ion-label>
-              <ion-input type="password" placeholder="Confirm your password"></ion-input>
-            </ion-item>
+            <label class="text-black text-s font-semibold"> Password </label>
+
+            <div class="flex items-center border-b border-pink-200 py-2">
+              <ion-icon
+                name="lock-closed-outline"
+                class="text-gray-800 text-xl mr-2"
+              ></ion-icon>
+
+              <input
+                type="password"
+                placeholder="Enter your password"
+                class="w-full outline-none bg-transparent"
+              />
+
+              <ion-icon
+                name="eye-off-outline"
+                class="text-red-400 text-lg"
+              ></ion-icon>
+            </div>
           </div>
 
-          <div class="flex items-start space-x-3">
-            <ion-item lines="none" class="bg-transparent flex-shrink-0">
-              <ion-checkbox slot="start" class="text-emerald-600"></ion-checkbox>
-            </ion-item>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              I agree to the <a href="#" class="text-emerald-600 hover:text-emerald-700 font-medium">Terms of Service</a>
-              and <a href="#" class="text-emerald-600 hover:text-emerald-700 font-medium">Privacy Policy</a>
-            </p>
+          <!-- confirm Password -->
+          <div>
+            <label class="text-black text-s font-semibold"> Confirm Password </label>
+
+            <div class="flex items-center border-b border-pink-200 py-2">
+              <ion-icon
+                name="lock-closed-outline"
+                class="text-gray-800 text-xl mr-2"
+              ></ion-icon>
+
+              <input
+                type="password"
+                placeholder="Confirm your password"
+                class="w-full outline-none bg-transparent"
+              />
+
+              <ion-icon
+                name="eye-off-outline"
+                class="text-red-400 text-lg"
+              ></ion-icon>
+            </div>
           </div>
 
-          <ion-button expand="block" class="mt-8 h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200" fill="solid">
-            <ion-icon name="person-add" slot="start"></ion-icon>
+          <!-- terms -->
+          <div class="flex items-center gap-2">
+            <ion-checkbox
+              name="terms"
+              class="text-pink-400"
+            ></ion-checkbox>
+            <label class="text-gray-600 text-sm">
+              I agree to the
+              <a href="#" class="text-pink-400 font-semibold">
+                Terms of Service
+              </a>
+              and
+              <a href="#" class="text-pink-400 font-semibold">
+                Privacy Policy
+              </a>
+            </label>
+          </div>
+
+          <!-- create Button -->
+          <button
+            type="submit"
+            class="w-full bg-[#ff8f8f] text-white py-3 rounded-xl font-semibold shadow-md active:scale-95 transition"
+          >
             Create Account
-          </ion-button>
-        </form>
+          </button>
 
-        <div class="mt-8 text-center">
-          <p class="text-slate-600">
+          <!-- Signup -->
+          <p class="text-center text-gray-400 text-sm">
             Already have an account?
-            <a routerLink="/login" class="text-emerald-600 hover:text-emerald-700 font-semibold ml-1">Sign in</a>
+            <span
+              class="text-[#ff8f8f] font-semibold cursor-pointer"
+              routerLink="/login"
+            >
+              Sign in
+            </span>
           </p>
-        </div>
+        </form>
       </div>
     </div>
-
-    <!-- Bottom decorative elements -->
-    <!-- <div class="mt-12 flex space-x-2">
-      <div class="h-2 w-2 rounded-full bg-emerald-200"></div>
-      <div class="h-2 w-8 rounded-full bg-emerald-400"></div>
-      <div class="h-2 w-2 rounded-full bg-emerald-200"></div>
-    </div> -->
   </div>
 </ion-content>

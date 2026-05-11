@@ -28,7 +28,7 @@ import {
   loadGroceries,
 } from '../store/actions/grocery.action';
 import { RouterLink } from '@angular/router';
-import { ApiService } from '../common/api-service';
+import { ApiService } from '../services/api-service/api-service';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { LoggerService } from '../services/logger-service';
 import { ItemCardComponent } from '../item-card/item-card.component';

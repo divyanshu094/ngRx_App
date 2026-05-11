@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonItem, IonButton, IonLabel, IonInput, IonIcon, IonCheckbox } from '@ionic/angular/standalone';
 import { RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { leaf, mail, lockClosed, logIn } from 'ionicons/icons';
+import { leaf, mail, lockClosed, logIn, mailOutline, lockClosedOutline, eyeOffOutline, } from 'ionicons/icons';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +16,7 @@ import { leaf, mail, lockClosed, logIn } from 'ionicons/icons';
 export class LoginPage implements OnInit {
 
   constructor() {
-    addIcons({ leaf, mail, lockClosed, logIn });
+    addIcons({mailOutline,lockClosedOutline,eyeOffOutline,leaf,mail,lockClosed,logIn});
   }
 
   ngOnInit() {

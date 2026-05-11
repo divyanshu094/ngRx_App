@@ -58,4 +58,99 @@ export class PaymentService {
         },
       });
   }
+
+   payViaUPI(app: string) {
+
+    this.createOrder((order: any) => {
+
+      const options = {
+
+        key: order.key,
+
+        amount: order.amount,
+
+        currency: order.currency,
+
+        order_id: order.orderId,
+
+        name: 'Softiqo Store',
+
+        description: 'Order Payment',
+
+        method: {
+          upi: true
+        },
+
+        upi: {
+          flow: 'intent'
+        },
+
+        external: {
+          wallets: ['phonepe', 'gpay', 'paytm']
+        },
+
+        handler: (response: any) => {
+
+          console.log(response);
+
+          this.verifyPayment(response);
+
+        },
+
+        theme: {
+          color: '#16a34a'
+        }
+
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+
+      rzp.open();
+
+    });
+
+  }
+
+  verifyPayment(data: any) {
+let token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTAwNTM2MzQzMmY3YzZjMzc4MGI0NjUiLCJpc0FkbWluIjpmYWxzZSwiaXNEZWxpdmVyeVBhcnRuZXIiOmZhbHNlLCJpYXQiOjE3Nzg0MDYzNTgsImV4cCI6MTc3OTAxMTE1OH0.PEc47X8YsRzcw4O1J3_ze0LKubOk9C1l4ekMVoeusP0';
+
+    this.http.post(
+      'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/verify-payment',
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    ).subscribe(res => {
+
+      console.log(res);
+
+    });
+
+  }
+
+  createOrder(callback: any) {
+let token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTAwNTM2MzQzMmY3YzZjMzc4MGI0NjUiLCJpc0FkbWluIjpmYWxzZSwiaXNEZWxpdmVyeVBhcnRuZXIiOmZhbHNlLCJpYXQiOjE3Nzg0MDYzNTgsImV4cCI6MTc3OTAxMTE1OH0.PEc47X8YsRzcw4O1J3_ze0LKubOk9C1l4ekMVoeusP0';
+
+    this.http.post<any>(
+      'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/create-order',
+      {
+        amount: 100
+      },
+       {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+    ).subscribe(order => {
+
+      callback(order);
+
+    });
+
+  }
+
 }
