@@ -52,7 +52,12 @@
         </h1>
 
         <!-- Form -->
-        <form class="mt-10 space-y-6">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-10 space-y-6">
+          <!-- Error Message -->
+          <div *ngIf="errorMessage()" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {{ errorMessage() }}
+          </div>
+
           <!-- Email -->
           <div>
             <label class="text-black text-s font-semibold"> Email </label>
@@ -64,10 +69,15 @@
               ></ion-icon>
 
               <input
+                formControlName="email"
                 type="email"
                 placeholder="demo@email.com"
                 class="w-full outline-none bg-transparent"
               />
+            </div>
+            <div *ngIf="email?.invalid && email?.touched" class="text-red-500 text-xs mt-1">
+              <span *ngIf="email?.errors?.['required']">Email is required</span>
+              <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>
             </div>
           </div>
 
@@ -82,22 +92,28 @@
               ></ion-icon>
 
               <input
-                type="password"
+                formControlName="password"
+                [type]="showPassword() ? 'text' : 'password'"
                 placeholder="Enter your password"
                 class="w-full outline-none bg-transparent"
               />
 
               <ion-icon
-                name="eye-off-outline"
-                class="text-red-400 text-lg"
+                [name]="showPassword() ? 'eye-outline' : 'eye-off-outline'"
+                class="text-red-400 text-lg cursor-pointer"
+                (click)="togglePasswordVisibility()"
               ></ion-icon>
+            </div>
+            <div *ngIf="password?.invalid && password?.touched" class="text-red-500 text-xs mt-1">
+              <span *ngIf="password?.errors?.['required']">Password is required</span>
+              <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
             </div>
           </div>
 
           <!-- Remember + Forgot -->
           <div class="flex items-center justify-between text-xs">
             <label class="flex items-center gap-2 text-gray-600">
-              <input type="checkbox" class="accent-pink-400" />
+              <input formControlName="rememberMe" type="checkbox" class="accent-pink-400" />
               Remember Me
             </label>
 
@@ -109,10 +125,10 @@
           <!-- Login Button -->
           <button
             type="submit"
-            class="w-full bg-[#ff8f8f] text-white py-3 rounded-xl font-semibold shadow-md active:scale-95 transition"
-            routerLink="/dashboard"
+            [disabled]="loginForm.invalid || isLoading()"
+            class="w-full bg-[#ff8f8f] text-white py-3 rounded-xl font-semibold shadow-md active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {{ isLoading() ? 'Logging in...' : 'Login' }}
           </button>
 
           <!-- Signup -->

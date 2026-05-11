@@ -14,7 +14,7 @@ export class GroceryEffects {
     this.actions$.pipe(
       ofType(loadGroceries),
       switchMap(() =>
-        this.api.getData('/api/products').pipe(
+        this.api.getData('products').pipe(
           map((data: any[]) =>
             loadGroceriesSuccess({
               groceries: data.map(({ _id, ...rest }) => ({

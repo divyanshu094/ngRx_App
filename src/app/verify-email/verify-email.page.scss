@@ -1,0 +1,21 @@
+ion-content {
+  --background: transparent;
+}
+
+input[type="text"]::-webkit-outer-spin-button,
+input[type="text"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="text"][inputmode="numeric"] {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5em;
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .relative.h-\[280px\] {
+    height: 240px;
+  }
+}

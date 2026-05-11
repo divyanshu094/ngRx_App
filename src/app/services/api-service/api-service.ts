@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment.prod';
+import { LoginRequest, RegisterRequest, AuthResponse } from 'src/app/models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -25,9 +26,24 @@ export class ApiService {
       );
   }
 
+  // Authentication endpoints
+  login(loginData: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}auth/login`, loginData)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  register(registerData: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}auth/register`, registerData)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   private handleError(error: any) {
     console.error('An error occurred', error);
-    return Promise.reject(error);
+    return throwError(() => error);
   }
 
 }
