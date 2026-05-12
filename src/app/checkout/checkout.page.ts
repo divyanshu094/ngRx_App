@@ -32,21 +32,21 @@ export class CheckoutPage implements OnInit {
     this.bucket$ = this.store.select("myBucket");
   }
 
-  getTotalPrice(items: Bucket[]): number {
-    return items.reduce((total, item) => total + ((item.price || 0) * item.quantity), 0);
-  }
+  // getTotalPrice(items: Bucket[]): number {
+  //   return items.reduce((total, item) => total + ((item.price || 0) * item.quantity), 0);
+  // }
 
-  getDeliveryFee(): number {
-    return 29; // ₹29 delivery fee like Zepto
-  }
+  // getDeliveryFee(): number {
+  //   return 29; // ₹29 delivery fee like Zepto
+  // }
 
-  getGST(items: Bucket[]): number {
-    return Math.round(this.getTotalPrice(items) * 0.05); // 5% GST
-  }
+  // getGST(items: Bucket[]): number {
+  //   return Math.round(this.getTotalPrice(items) * 0.05); // 5% GST
+  // }
 
-  getGrandTotal(items: Bucket[]): number {
-    return this.getTotalPrice(items) + this.getDeliveryFee() + this.getGST(items);
-  }
+  // getGrandTotal(items: Bucket[]): number {
+  //   return this.getTotalPrice(items) + this.getDeliveryFee() + this.getGST(items);
+  // }
 
   placeOrder() {
     // Here you would typically integrate with a payment gateway

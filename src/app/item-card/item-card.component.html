@@ -6,11 +6,13 @@
     class="relative flex items-center justify-center rounded-[0.5rem] bg-[#f8f8f8] p-3"
   >
     <!-- Discount -->
+    @if ((item.discountPercentage ?? 0) > 0) {
     <div
       class="absolute left-2 top-2 rounded-[0.5rem] bg-pink-500 px-2 py-1 text-[11px] font-bold leading-tight text-white"
     >
-      38% OFF
+      {{ item.discountPercentage }}% OFF
     </div>
+    }
 
     <!-- Wishlist -->
     <button
@@ -28,7 +30,7 @@
 
     <!-- Add / Quantity -->
     <div class="absolute bottom-2 right-2">
-      @if (item.quantity > 0) {
+      @if ((item.quantity ?? 0) > 0) {
         <div
           class="flex h-9 items-center justify-between rounded-[0.5rem] border border-pink-500 bg-pink-700 px-2 shadow-sm"
         >
@@ -67,16 +69,16 @@
   </div>
 
   <ion-card-content class="p-3">
-    <h2 class="text-[15px] font-semibold leading-5 text-gray-900 line-clamp-2">
+    <h2 class="text-[15px] font-semibold leading-5 text-gray-900 line-clamp-2 truncate">
       {{ item.name }}
     </h2>
     <div class="mt-2 flex items-center gap-2">
       <span class="text-[20px] font-bold text-black">
-        {{ item.price | currency: "INR" : "symbol" }}
+        {{ discountedPrice() | currency: "INR" : "symbol" }}
       </span>
 
       <span class="text-[14px] text-gray-400 line-through">
-        {{ item.price + 200 | currency: "INR" : "symbol" }}
+        {{item.price.amount | currency: "INR" : "symbol" }}
       </span>
     </div>
 

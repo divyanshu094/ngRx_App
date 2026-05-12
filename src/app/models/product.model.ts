@@ -28,6 +28,8 @@ export interface Attributes {
 
 export interface Product {
   id: string;
+  _id?: string;
+  quantity?: number;
   name: string;
   description: string;
   type: string;
@@ -36,6 +38,9 @@ export interface Product {
   price: Price;
   stock: Stock;
   images: string[];
+  image?: string;
+  thumbnail?: string;
+  discountPercentage?: number;
   rating: Rating;
   attributes: Attributes;
   tags: string[];

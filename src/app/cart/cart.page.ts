@@ -30,7 +30,6 @@ import { Observable } from 'rxjs';
 import { addIcons } from 'ionicons';
 import { remove, add, cart, trash, arrowBack, bagCheck } from 'ionicons/icons';
 import { Bucket } from '../models/bucket.model';
-import { Grocery } from '../models/grocery.model';
 import { Store } from '@ngrx/store';
 import { addToBucket, removeFromBucket } from '../store/actions/bucket.action';
 import {
@@ -45,32 +44,27 @@ import { PaymentService } from '../services/payment.service';
   templateUrl: './cart.page.html',
   styleUrls: ['./cart.page.scss'],
   standalone: true,
-  imports: [
-    IonContent,
-    CommonModule,
-    IonCard,
-    IonItem,
-    IonLabel,
-    IonButton,
-    IonIcon,
-    RouterLink,
-  ],
+  imports: [IonContent, CommonModule, IonButton, IonIcon, RouterLink],
 })
 export class CartPage implements OnInit {
   bucketItems: Signal<Bucket[]> = signal([]);
   totalPrice = computed(() =>
     this.bucketItems().reduce(
-      (total, item) => total + (item.price || 0) * item.quantity,
+      (total, item) =>
+        total +
+        ((item.price?.finalAmount ?? item.price?.amount ?? 0) || 0) *
+          item.quantity,
       0,
     ),
   );
-  deliveryFee = signal(29); // ₹29 delivery fee like Zepto
-  gst = computed(() => Math.round(this.totalPrice() * 0.05)); // 5% GST
+  deliveryFee = signal(0); // ₹29 delivery fee like Zepto
+  // gst = computed(() => Math.round(this.totalPrice() * 0.05)); // 5% GST
+  gst = computed(() => Math.round(this.totalPrice() * 0)); // 0% GST
   grandTotal = computed(
-    () => this.totalPrice() + this.deliveryFee() + this.gst(),
+    () => (this.totalPrice() + this.deliveryFee() + this.gst()),
   );
-  getFinalPrice = computed(() => this.grandTotal());
   hasItems = computed(() => this.bucketItems().length > 0);
+  
   constructor(
     private store: Store<{ myBucket: Bucket[] }>,
     private paymentService: PaymentService,
@@ -86,28 +80,30 @@ export class CartPage implements OnInit {
   }
 
   increment(item: Bucket) {
+    // Ensure all product properties are explicitly preserved when incrementing
     const payload: Bucket = {
       id: item.id,
+      _id: item._id,
       name: item.name,
-      type: item.type || '',
-      quantity: 1,
-      price: item.price,
-      image: item.image,
       description: item.description,
+      type: item.type,
+      category: item.category,
+      brand: item.brand,
+      price: item.price,
+      stock: item.stock,
+      images: item.images,
+      image: item.image,
+      thumbnail: item.thumbnail,
+      discountPercentage: item.discountPercentage,
+      rating: item.rating,
+      attributes: item.attributes,
+      tags: item.tags,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      quantity: 1,
     };
     this.store.dispatch(addToBucket({ payload }));
-
-    const groceryPayload: Grocery = {
-      id: item.id,
-      name: item.name,
-      type: item.type || '',
-      quantity: 1,
-      price: item.price || 0,
-      stock: 0,
-      description: item.description || '',
-      image: item.image || '',
-    };
-    this.store.dispatch(increaseQuantity({ payload: groceryPayload }));
+    this.store.dispatch(increaseQuantity({ payload }));
   }
 
   decrement(item: Bucket) {
@@ -122,6 +118,6 @@ export class CartPage implements OnInit {
     // const paymentService = inject(PaymentService);
     // const total = this.grandTotal();
     // this.paymentService.payNow(this.grandTotal()); // Using the computed grand total
-    this.paymentService.payViaUPI('phonepe');
+    this.paymentService.payViaUPI('phonepe', this.grandTotal());
   }
 }

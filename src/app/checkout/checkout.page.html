@@ -89,7 +89,7 @@
                 <p class="text-sm font-medium text-slate-900 truncate">{{ item.name }}</p>
                 <p class="text-xs text-slate-500">Qty: {{ item.quantity }}</p>
               </div>
-              <p class="text-sm font-semibold text-slate-900">₹{{ (item.price || 0) * item.quantity }}</p>
+              <!-- <p class="text-sm font-semibold text-slate-900">₹{{ (item.price || 0) * item.quantity }}</p> -->
             </div>
             }
           </div>
@@ -99,19 +99,19 @@
             @if ((bucket$ | async); as items) {
             <div class="flex justify-between text-sm">
               <span class="text-slate-600">Subtotal</span>
-              <span class="text-slate-900 font-medium">₹{{ getTotalPrice(items) }}</span>
+              <!-- <span class="text-slate-900 font-medium">₹{{ getTotalPrice(items) }}</span> -->
             </div>
             <div class="flex justify-between text-sm">
               <span class="text-slate-600">Delivery Fee</span>
-              <span class="text-slate-900 font-medium">₹{{ getDeliveryFee() }}</span>
+              <!-- <span class="text-slate-900 font-medium">₹{{ getDeliveryFee() }}</span> -->  
             </div>
             <div class="flex justify-between text-sm">
               <span class="text-slate-600">GST (5%)</span>
-              <span class="text-slate-900 font-medium">₹{{ getGST(items) }}</span>
+              <!-- <span class="text-slate-900 font-medium">₹{{ getGST(items) }}</span> -->
             </div>
             <div class="flex justify-between text-lg font-semibold pt-2 border-t border-slate-200">
               <span class="text-slate-900">Total</span>
-              <span class="text-emerald-600">₹{{ getGrandTotal(items) }}</span>
+              <!-- <span class="text-emerald-600">₹{{ getGrandTotal(items) }}</span> -->
             </div>
             }
           </div>

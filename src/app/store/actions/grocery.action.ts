@@ -1,5 +1,5 @@
 import { createAction, props } from "@ngrx/store"
-import { Grocery } from "src/app/models/grocery.model"
+import { Product } from "src/app/models/product.model"
 
 
 export const loadGroceries = createAction(
@@ -8,7 +8,7 @@ export const loadGroceries = createAction(
 
 export const loadGroceriesSuccess = createAction(
     '[Grocery] Load Success',
-    props<{ groceries: Grocery[] }>()
+    props<{ groceries: Product[] }>()
 );
 
 export const loadGroceriesFailure = createAction(
@@ -19,10 +19,10 @@ export const loadGroceriesFailure = createAction(
 
 export const increaseQuantity = createAction(
     "[Grocery] increase",
-    props<{ payload: Grocery }>()
+    props<{ payload: Product }>()
 )
 
 export const decreaseQuantity = createAction(
     "[Grocery] decrease",
-    props<{ payload: Partial<Grocery> }>()
+    props<{ payload: Partial<Product> }>()
 )

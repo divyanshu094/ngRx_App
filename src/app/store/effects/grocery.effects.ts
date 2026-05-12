@@ -15,100 +15,65 @@ export class GroceryEffects {
       ofType(loadGroceries),
       switchMap(() =>
         this.api.getData('products').pipe(
-          map((data: any[]) =>
-            loadGroceriesSuccess({
-              groceries: data.map(({ _id, ...rest }) => ({
-                id: _id,
-                quantity: 0,  // initialize quantity
-                ...rest
+          map((response: any) => {
+            const products: any[] = Array.isArray(response)
+              ? response
+              : response?.data ?? response?.products ?? [];
+
+            return loadGroceriesSuccess({
+              groceries: products.map((product) => ({
+                id: product._id ?? product.id,
+                _id: product._id ?? undefined,
+                quantity: 0,
+                name: product.name ?? product.title ?? 'Unknown',
+                type: product.type ?? product.category ?? 'Other',
+                category: product.category ?? product.type ?? 'General',
+                brand: product.brand ?? 'Unknown',
+                description: product.description ?? product.summary ?? '',
+                price: typeof product.price === 'object'
+                  ? {
+                      currency: product.price.currency ?? 'INR',
+                      amount: product.price.amount ?? product.price.finalAmount ?? 0,
+                      discount: product.price.discount,
+                      finalAmount: product.price.finalAmount ?? product.price.amount ?? 0,
+                    }
+                  : {
+                      currency: 'INR',
+                      amount: Number(product.price ?? 0),
+                      finalAmount: Number(product.price ?? 0),
+                    },
+                stock: typeof product.stock === 'object'
+                  ? {
+                      quantity: product.stock.quantity ?? 0,
+                      availability: product.stock.availability ?? true,
+                    }
+                  : {
+                      quantity: Number(product.stock ?? 0),
+                      availability: Number(product.stock ?? 0) > 0,
+                    },
+                images: Array.isArray(product.images)
+                  ? product.images
+                  : product.images ? [product.images] : [],
+                image: Array.isArray(product.images)
+                  ? product.images[0] ?? ''
+                  : product.image ?? product.thumbnail ?? '',
+                discountPercentage: product.discountPercentage ?? product.discount ?? product.discountPercent ?? 0,
+                rating: typeof product.rating === 'object'
+                  ? {
+                      average: product.rating.average ?? 0,
+                      count: product.rating.count ?? 0,
+                    }
+                  : { average: 0, count: 0 },
+                attributes: product.attributes ?? product.attrs ?? {},
+                tags: Array.isArray(product.tags) ? product.tags : [],
+                createdAt: product.createdAt ?? product.created_at ?? '',
+                updatedAt: product.updatedAt ?? product.updated_at ?? '',
               }))
-            })
-          ),
+            });
+          }),
           catchError(error => {
-            // Return mock data if API fails
-            const mockGroceries = [
-              {
-                id: 1,
-                name: "Fresh Tomatoes",
-                type: "Vegetables",
-                quantity: 0,
-                price: 40,
-                stock: 50,
-                description: "Organic red tomatoes, perfect for salads",
-                image: "./assets/icon/favicon.png"
-              },
-              {
-                id: 2,
-                name: "Bananas",
-                type: "Fruits",
-                quantity: 0,
-                price: 30,
-                stock: 100,
-                description: "Sweet and ripe bananas",
-                image: "./assets/icon/favicon.png"
-              },
-              {
-                id: 3,
-                name: "Milk",
-                type: "Dairy",
-                quantity: 0,
-                price: 25,
-                stock: 30,
-                description: "Fresh cow milk, 1 liter",
-                image: "./assets/icon/favicon.png"
-              },
-              {
-                id: 4,
-                name: "Orange Juice",
-                type: "Beverages",
-                quantity: 0,
-                price: 60,
-                stock: 20,
-                description: "Freshly squeezed orange juice",
-                image: "./assets/icon/favicon.png"
-              },
-              {
-                id: 5,
-                name: "Potatoes",
-                type: "Vegetables",
-                quantity: 0,
-                price: 20,
-                stock: 80,
-                description: "Fresh potatoes for cooking",
-                image: "./assets/icon/favicon.png"
-              },
-              {
-                id: 6,
-                name: "Apples",
-                type: "Fruits",
-                quantity: 0,
-                price: 80,
-                stock: 40,
-                description: "Crisp red apples",
-                image: "./assets/icon/favicon.png"
-              },
-              {
-                id: 7,
-                name: "Bread",
-                type: "Snacks",
-                quantity: 0,
-                price: 25,
-                stock: 25,
-                description: "Fresh whole wheat bread",
-                image: "./assets/icon/favicon.png"
-              },
-              {
-                id: 8,
-                name: "Cheese",
-                type: "Dairy",
-                quantity: 0,
-                price: 120,
-                stock: 15,
-                description: "Cheddar cheese block",
-                image: "./assets/icon/favicon.png"
-              }
-            ];
-            return of(loadGroceriesSuccess({ groceries: mockGroceries }));
+            console.error('Error loading groceries:', error);
+            return of(loadGroceriesFailure({ error }));
           })
         )
       )

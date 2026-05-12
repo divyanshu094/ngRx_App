@@ -8,7 +8,7 @@ import {
   IonInput,
   IonIcon,
 } from '@ionic/angular/standalone';
-import { Grocery } from '../models/grocery.model';
+import { Product } from '../models/product.model';
 import { Store } from '@ngrx/store';
 import { addIcons } from 'ionicons';
 import {
@@ -51,7 +51,7 @@ import { ItemCardComponent } from '../item-card/item-card.component';
 })
 export class DashboardPage implements OnInit {
   isScrolled = signal(false);
-  groceries: Signal<Grocery[]> = signal<Grocery[]>([]);
+  groceries: Signal<Product[]> = signal<Product[]>([]);
   bucketItems: Signal<Bucket[]> = signal([]);
   bucketCount = computed(() =>
     this.bucketItems().reduce((count, item) => count + item.quantity, 0),
@@ -99,7 +99,7 @@ export class DashboardPage implements OnInit {
   ];
 
   constructor(
-    private store: Store<{ groceries: Grocery[]; myBucket: Bucket[] }>,
+    private store: Store<{ groceries: Product[]; myBucket: Bucket[] }>,
     private apiService: ApiService,
     private logger: LoggerService,
   ) {
@@ -130,10 +130,10 @@ export class DashboardPage implements OnInit {
   }
 
   private filterGroceries(
-    groceries: Grocery[],
+    groceries: Product[],
     search: string,
     category: string,
-  ): Grocery[] {
+  ): Product[] {
     return groceries.filter((grocery) => {
       const matchesSearch =
         !search ||

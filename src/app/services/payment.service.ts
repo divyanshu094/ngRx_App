@@ -59,9 +59,9 @@ export class PaymentService {
       });
   }
 
-   payViaUPI(app: string) {
+   payViaUPI(app: string,amount: number = 0) {
 
-    this.createOrder((order: any) => {
+    this.createOrder((order: any,amount: number) => {
 
       const options = {
 
@@ -131,14 +131,14 @@ let token =
 
   }
 
-  createOrder(callback: any) {
+  createOrder(callback: any,amount: number = 0) {
 let token =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTAwNTM2MzQzMmY3YzZjMzc4MGI0NjUiLCJpc0FkbWluIjpmYWxzZSwiaXNEZWxpdmVyeVBhcnRuZXIiOmZhbHNlLCJpYXQiOjE3Nzg0MDYzNTgsImV4cCI6MTc3OTAxMTE1OH0.PEc47X8YsRzcw4O1J3_ze0LKubOk9C1l4ekMVoeusP0';
 
     this.http.post<any>(
       'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/create-order',
       {
-        amount: 100
+        amount: amount
       },
        {
           headers: {
