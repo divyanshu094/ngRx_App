@@ -81,7 +81,7 @@ export class RegisterPage implements OnInit {
       confirmPassword: this.registerForm.get('confirmPassword')?.value
     };
 
-    this.apiService.register(registerData).subscribe({
+    this.apiService.postData('auth/register', registerData).subscribe({
       next: (response) => {
         if (response.success) {
           // Check if email verification is required

@@ -25,6 +25,8 @@
     "@capacitor/android": "^7.6.4",
     "@capacitor/app": "7.0.2",
     "@capacitor/core": "7.4.3",
+    "@capacitor/geolocation": "^8.2.0",
+    "@capacitor/google-maps": "^8.0.1",
     "@capacitor/haptics": "7.0.2",
     "@capacitor/keyboard": "7.0.2",
     "@capacitor/status-bar": "7.0.2",

@@ -60,6 +60,7 @@ export class DashboardPage implements OnInit {
   groceries: Signal<Product[]> = signal<Product[]>([]);
   bucketItems: Signal<Bucket[]> = signal([]);
   categories: Signal<Category[]> = signal<Category[]>([]);
+  selectedAddress = signal('');
   currentPage = 1;
   hasMore = signal(true);
   isLoadingMore = signal(false);
@@ -90,6 +91,17 @@ export class DashboardPage implements OnInit {
     this.categories = toSignal(this.store.select('categories'), {
       initialValue: [],
     });
+  }
+
+  ionViewWillEnter() {
+    const savedAddress = localStorage.getItem('selectedAddress');
+    if (savedAddress) {
+      const address = JSON.parse(savedAddress);
+
+      this.selectedAddress.set(
+        `${address.type} - ${address.street}, ${address.city}`,
+      );
+    }
   }
 
   ngOnInit() {
@@ -135,7 +147,8 @@ export class DashboardPage implements OnInit {
         !search ||
         grocery.name.toLowerCase().includes(search.toLowerCase()) ||
         grocery.description.toLowerCase().includes(search.toLowerCase());
-      const matchesCategory = category === 'All' || grocery.category === category;
+      const matchesCategory =
+        category === 'All' || grocery.category === category;
 
       return matchesSearch && matchesCategory;
     });

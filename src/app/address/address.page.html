@@ -1,116 +1,169 @@
-<!-- <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Saved Addresses</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="toggleAddForm()">
-        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header> -->
-
 <ion-content fullscreen class="address-content">
   <div class="mx-auto max-w-4xl px-4 bg-orange-300 py-3 h-screen overflow-auto">
     <!--  Header -->
-    <div class="mb-6">
+    <div class="mb-2">
       <div class="flex items-center justify-between gap-3 mb-4">
         <ion-button fill="clear" routerLink="/dashboard" class="text-black">
           <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
         </ion-button>
-        <h1 class="text-2xl font-bold text-slate-900">Saved Addresses</h1>
-         <ion-button fill="clear" class="text-black" (click)="toggleAddForm()">
-        <ion-icon slot="icon-only" name="add"></ion-icon>
-      </ion-button>
+        <h1 class="text-xl font-bold text-slate-900">Saved Addresses</h1>
+        <ion-button fill="clear" class="text-black" (click)="toggleAddForm()">
+          <ion-icon slot="icon-only" name="add"></ion-icon>
+        </ion-button>
       </div>
     </div>
 
-    <div class="address-summary">
-      <p
-        *ngIf="savedAddresses.length === 0 && !showAddForm"
-        class="empty-state"
-      >
+    <div class="space-y-3 mt-4">
+      @if(savedAddresses().length === 0 && !showAddForm){
+      <p class="empty-state">
         No saved addresses yet. Tap + to add your first address.
       </p>
-      <ion-card *ngFor="let address of savedAddresses" class="address-card">
-        <ion-card-header>
-          <ion-card-subtitle>{{ address.label || 'Home' }}</ion-card-subtitle>
-        </ion-card-header>
-        <ion-card-content>
-          <p><strong>House / Building:</strong> {{ address.house }}</p>
-          <p><strong>Landmark:</strong> {{ address.landmark || 'None' }}</p>
-          <p><strong>Location:</strong> {{ address.locationLabel }}</p>
-        </ion-card-content>
-      </ion-card>
-    </div>
-
-    <div class="form-container" *ngIf="showAddForm">
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Add new address</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-list>
-            <ion-item>
-              <ion-label position="stacked">House No. / Building</ion-label>
-              <ion-input
-                [(ngModel)]="newAddress.house"
-                placeholder="Enter house or building"
-                required
-              ></ion-input>
-            </ion-item>
-
-            <ion-item>
-              <ion-label position="stacked">Landmark</ion-label>
-              <ion-input
-                [(ngModel)]="newAddress.landmark"
-                placeholder="Enter landmark"
-              ></ion-input>
-            </ion-item>
-
-            <ion-item>
-              <ion-label position="stacked">Address Label</ion-label>
-              <ion-input
-                [(ngModel)]="newAddress.label"
-                placeholder="e.g. Home, Work"
-              ></ion-input>
-            </ion-item>
-          </ion-list>
-
-          <div class="map-card">
-            <div class="map-header">
-              <span>Choose location on map</span>
-              <span class="location-value" *ngIf="selectedLocation"
-                >{{ selectedLocation }}</span
-              >
+      }
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        @for(address of savedAddresses();track address.id){
+        <div (click)="selectAddress(address)" class="flex items-start justify-between gap-3 border-b last:border-b-0 last:mb-0 border-gray-300 pb-2 mb-2">
+          <!-- Left -->
+          <div class="flex gap-3 flex-1">
+            <!-- Location Icon -->
+            <div
+              class="w-11 h-11 min-w-11 rounded-full bg-orange-100 flex items-center justify-center"
+            >
+              <ion-icon name="location" class="text-orange-500 text-lg">
+              </ion-icon>
             </div>
-            <div class="map-placeholder" (click)="chooseLocation($event)">
-              <div class="map-overlay">
-                <p>Tap to select location</p>
-                <p class="map-hint">
-                  Latitude / longitude are generated from the tapped point.
-                </p>
+
+            <!-- Address Content -->
+            <div class="flex-1">
+              <!-- Address Type -->
+              <div class="mb-2">
+                <span
+                  class="px-3 py-1 rounded-full text-xs font-semibold uppercase bg-green-100 text-green-700"
+                >
+                  {{ address.type }}
+                </span>
               </div>
+
+              <!-- Main Address -->
+              <p class="text-sm font-semibold text-gray-800 leading-5">
+                {{ address.street }}
+              </p>
+
+              <!-- Secondary -->
+              <p class="text-sm text-gray-500 mt-1">
+                {{ address.city }}, {{ address.state }}, {{ address.zipCode }}
+              </p>
+
+              <p class="text-sm text-gray-500">{{ address.country }}</p>
             </div>
           </div>
 
-          <div class="form-actions">
-            <ion-button
-              expand="block"
-              color="primary"
-              (click)="saveAddress()"
-              [disabled]="!isFormValid()"
-              >Save Address</ion-button
-            >
-            <ion-button
-              expand="block"
-              fill="outline"
-              color="medium"
-              (click)="cancelForm()"
-              >Cancel</ion-button
-            >
+          <!-- Actions -->
+          <div class="flex flex-col">
+            <ion-button fill="clear" size="small" class="text-gray-500">
+              <ion-icon name="create-outline" slot="icon-only"> </ion-icon>
+            </ion-button>
+
+            <ion-button fill="clear" size="small" color="danger">
+              <ion-icon name="trash-outline" slot="icon-only"> </ion-icon>
+            </ion-button>
           </div>
-        </ion-card-content>
-      </ion-card>
+        </div>
+        }
+      </div>
     </div>
+
+    @if(showAddForm){
+    <div class="form-container bg-white p-4 rounded-lg shadow-md">
+      <h1 class="mb-4 font-bold">Add new address</h1>
+
+      <div class="map-card">
+        <input
+          #searchInput
+          type="text"
+          placeholder="Search location"
+          class="w-full h-10 bg-white p-4 border border-gray-300 rounded-xl shadow-lg outline-none"
+        />
+        @if(platform.is('hybrid')){
+        <capacitor-google-map #map id="map"> </capacitor-google-map>
+        } @else {
+        <div #map id="map" class="w-full h-[300px] rounded-xl"></div>
+        }
+      </div>
+      <!-- <h2 class="font-bold text-lg mb-2">Select delivery location</h2>
+
+      <p class="text-gray-600 text-sm mb-3">{{ selectedAddress }}</p> -->
+      <ion-list>
+        <ion-item>
+          <!-- <ion-label position="stacked">Street</ion-label> -->
+          <ion-input
+            [(ngModel)]="newAddress.street"
+            placeholder="Enter street"
+            required
+          ></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <!-- <ion-label position="stacked">City</ion-label> -->
+          <ion-input
+            [(ngModel)]="newAddress.city"
+            placeholder="Enter city"
+            required
+          ></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <!-- <ion-label position="stacked">State</ion-label> -->
+          <ion-input
+            [(ngModel)]="newAddress.state"
+            placeholder="Enter state"
+            required
+          ></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <!-- <ion-label position="stacked">Zip Code</ion-label> -->
+          <ion-input
+            [(ngModel)]="newAddress.zipCode"
+            placeholder="Enter zip code"
+            required
+          ></ion-input>
+        </ion-item>
+
+        <!-- <ion-item>
+          <ion-label position="stacked">Country</ion-label>
+          <ion-input
+            [(ngModel)]="newAddress.country"
+            placeholder="Enter country"
+            required
+          ></ion-input>
+        </ion-item> -->
+
+        <ion-item>
+          <!-- <ion-label position="stacked">Address Label</ion-label> -->
+          <ion-input
+            [(ngModel)]="newAddress.type"
+            placeholder="e.g. Home, Work"
+          ></ion-input>
+        </ion-item>
+      </ion-list>
+
+      <div class="form-actions">
+        <ion-button
+          expand="block"
+          color="primary"
+          (click)="saveAddress()"
+          [disabled]="!isFormValid()"
+          >Save Address</ion-button
+        >
+        <ion-button
+          expand="block"
+          fill="outline"
+          color="medium"
+          (click)="cancelForm()"
+          >Cancel</ion-button
+        >
+      </div>
+    </div>
+    }
   </div>
 </ion-content>
