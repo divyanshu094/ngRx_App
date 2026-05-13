@@ -3,12 +3,13 @@ import { Product } from "src/app/models/product.model"
 
 
 export const loadGroceries = createAction(
-    '[Grocery] Load'
+    '[Grocery] Load',
+    props<{ page?: number; append?: boolean }>()
 );
 
 export const loadGroceriesSuccess = createAction(
     '[Grocery] Load Success',
-    props<{ groceries: Product[] }>()
+    props<{ groceries: Product[]; append?: boolean }>()
 );
 
 export const loadGroceriesFailure = createAction(

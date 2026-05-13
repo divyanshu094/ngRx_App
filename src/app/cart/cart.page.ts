@@ -61,10 +61,10 @@ export class CartPage implements OnInit {
   // gst = computed(() => Math.round(this.totalPrice() * 0.05)); // 5% GST
   gst = computed(() => Math.round(this.totalPrice() * 0)); // 0% GST
   grandTotal = computed(
-    () => (this.totalPrice() + this.deliveryFee() + this.gst()),
+    () => this.totalPrice() + this.deliveryFee() + this.gst(),
   );
   hasItems = computed(() => this.bucketItems().length > 0);
-  
+
   constructor(
     private store: Store<{ myBucket: Bucket[] }>,
     private paymentService: PaymentService,
@@ -117,7 +117,7 @@ export class CartPage implements OnInit {
   async initiatePayment() {
     // const paymentService = inject(PaymentService);
     // const total = this.grandTotal();
-    // this.paymentService.payNow(this.grandTotal()); // Using the computed grand total
-    this.paymentService.payViaUPI('phonepe', this.grandTotal());
+    this.paymentService.payNow(this.grandTotal()); // Using the computed grand total
+    // this.paymentService.payViaUPI('phonepe', this.grandTotal());
   }
 }

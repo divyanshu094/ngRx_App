@@ -20,6 +20,9 @@ export class PaymentService {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'ngrok-skip-browser-warning': 'true',
           },
         },
       )
@@ -59,98 +62,91 @@ export class PaymentService {
       });
   }
 
-   payViaUPI(app: string,amount: number = 0) {
+  // payViaUPI(app: string, amount: number) {
+    
+  //   this.createOrder((order: any, amount: number) => {
+  //     const options = {
+  //       key: order.key,
 
-    this.createOrder((order: any,amount: number) => {
+  //       amount: order.amount,
 
-      const options = {
+  //       currency: order.currency,
 
-        key: order.key,
+  //       order_id: order.orderId,
 
-        amount: order.amount,
+  //       name: 'Softiqo Store',
 
-        currency: order.currency,
+  //       description: 'Order Payment',
 
-        order_id: order.orderId,
+  //       method: {
+  //         upi: true,
+  //       },
 
-        name: 'Softiqo Store',
+  //       upi: {
+  //         flow: 'intent',
+  //       },
 
-        description: 'Order Payment',
+  //       external: {
+  //         wallets: ['phonepe', 'gpay', 'paytm'],
+  //       },
 
-        method: {
-          upi: true
-        },
+  //       handler: (response: any) => {
+  //         console.log(response);
 
-        upi: {
-          flow: 'intent'
-        },
+  //         this.verifyPayment(response);
+  //       },
 
-        external: {
-          wallets: ['phonepe', 'gpay', 'paytm']
-        },
+  //       theme: {
+  //         color: '#16a34a',
+  //       },
+  //     };
 
-        handler: (response: any) => {
+  //     const rzp = new (window as any).Razorpay(options);
 
-          console.log(response);
-
-          this.verifyPayment(response);
-
-        },
-
-        theme: {
-          color: '#16a34a'
-        }
-
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-
-      rzp.open();
-
-    });
-
-  }
+  //     rzp.open();
+  //   });
+  // }
 
   verifyPayment(data: any) {
-let token =
+    let token =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTAwNTM2MzQzMmY3YzZjMzc4MGI0NjUiLCJpc0FkbWluIjpmYWxzZSwiaXNEZWxpdmVyeVBhcnRuZXIiOmZhbHNlLCJpYXQiOjE3Nzg0MDYzNTgsImV4cCI6MTc3OTAxMTE1OH0.PEc47X8YsRzcw4O1J3_ze0LKubOk9C1l4ekMVoeusP0';
 
-    this.http.post(
-      'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/verify-payment',
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    this.http
+      .post(
+        'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/verify-payment',
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'ngrok-skip-browser-warning': 'true',
+          },
         },
-      }
-    ).subscribe(res => {
-
-      console.log(res);
-
-    });
-
+      )
+      .subscribe((res) => {
+        console.log(res);
+      });
   }
 
-  createOrder(callback: any,amount: number = 0) {
-let token =
+  createOrder(callback: any, amount: number) {
+    let token =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTAwNTM2MzQzMmY3YzZjMzc4MGI0NjUiLCJpc0FkbWluIjpmYWxzZSwiaXNEZWxpdmVyeVBhcnRuZXIiOmZhbHNlLCJpYXQiOjE3Nzg0MDYzNTgsImV4cCI6MTc3OTAxMTE1OH0.PEc47X8YsRzcw4O1J3_ze0LKubOk9C1l4ekMVoeusP0';
 
-    this.http.post<any>(
-      'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/create-order',
-      {
-        amount: amount
-      },
-       {
+    this.http
+      .post<any>(
+        'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/create-order',
+        {
+          amount: amount,
+        },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         },
-    ).subscribe(order => {
-
-      callback(order);
-
-    });
-
+      )
+      .subscribe((order) => {
+        callback(order,amount);
+      });
   }
-
 }

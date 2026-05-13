@@ -10,6 +10,7 @@ import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { isDevMode } from '@angular/core';
 import { reducers } from './app/store';
 import { GroceryEffects } from './app/store/effects/grocery.effects';
+import { CategoryEffects } from './app/store/effects/category.effects';
 import { hydrationMetaReducer } from './app/store/reducers/meta.reducer';
 
 bootstrapApplication(AppComponent, {
@@ -22,7 +23,7 @@ bootstrapApplication(AppComponent, {
      reducers,
       { metaReducers: [hydrationMetaReducer] }
     ),
-    provideEffects([GroceryEffects]),
+    provideEffects([GroceryEffects, CategoryEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
   ],
 });

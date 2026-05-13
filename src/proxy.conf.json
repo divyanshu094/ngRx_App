@@ -1,0 +1,7 @@
+{
+  "/api": {
+    "target": "https://extras-wanting-unlatch.ngrok-free.dev",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

@@ -74,7 +74,7 @@
       class="px-2 py-2 overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-hide"
     >
       <div class="flex gap-4 w-max">
-        @for (category of categories; track category.id) {
+        @for (category of categories(); track category.id) {
 
         <div
           class="flex flex-col items-center min-w-[70px] relative"
@@ -93,7 +93,7 @@
           <p
             class="mt-2 text-[15px] font-semibold text-black whitespace-nowrap"
           >
-            {{ category.name }}
+            {{ category.title }}
           </p>
 
           @if (selectedCategory() === category.name) {
@@ -117,6 +117,13 @@
 
       }
     </div>
+
+    <ion-infinite-scroll threshold="150px" (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content
+        loadingSpinner="bubbles"
+        loadingText="Loading more products..."
+      ></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
   </div>
 
   <!-- FLOATING CART -->

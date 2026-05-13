@@ -13,21 +13,24 @@ export class GroceryEffects {
   loadGroceries$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadGroceries),
-      switchMap(() =>
-        this.api.getData('products').pipe(
+      switchMap(({ page = 1, append = false }) => {
+        const limit = 20;
+        const endpoint = `products?page=${page}&limit=${limit}`;
+        return this.api.getData(endpoint).pipe(
           map((response: any) => {
             const products: any[] = Array.isArray(response)
               ? response
               : response?.data ?? response?.products ?? [];
 
             return loadGroceriesSuccess({
+              // groceries:products,
               groceries: products.map((product) => ({
                 id: product._id ?? product.id,
                 _id: product._id ?? undefined,
                 quantity: 0,
                 name: product.name ?? product.title ?? 'Unknown',
                 type: product.type ?? product.category ?? 'Other',
-                category: product.category ?? product.type ?? 'General',
+                category: product.cat_name ?? product.type ?? 'General',
                 brand: product.brand ?? 'Unknown',
                 description: product.description ?? product.summary ?? '',
                 price: typeof product.price === 'object'
@@ -68,15 +71,16 @@ export class GroceryEffects {
                 tags: Array.isArray(product.tags) ? product.tags : [],
                 createdAt: product.createdAt ?? product.created_at ?? '',
                 updatedAt: product.updatedAt ?? product.updated_at ?? '',
-              }))
+              })),
+              append,
             });
           }),
           catchError(error => {
             console.error('Error loading groceries:', error);
             return of(loadGroceriesFailure({ error }));
           })
-        )
-      )
+        );
+      })
     )
   );
 }

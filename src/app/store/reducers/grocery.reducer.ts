@@ -8,15 +8,22 @@ const initialState: Product[] = []
 export const groceryReducer = createReducer(
     initialState,
   
-    on(loadGroceriesSuccess, (state, { groceries }) => {
-        return groceries.map(product => {
+    on(loadGroceriesSuccess, (state, { groceries, append }) => {
+        const nextProducts = groceries.map(product => {
             const existing = state.find(s => s.id === product.id);
 
             return {
                 ...product,
-                quantity: existing?.quantity ?? 0
+                quantity: existing?.quantity ?? product.quantity ?? 0
             };
         });
+
+        if (append) {
+            const newProducts = nextProducts.filter(product => !state.some(s => s.id === product.id));
+            return [...state, ...newProducts];
+        }
+
+        return nextProducts;
     }),
 
     on(increaseQuantity, (state, action) => {

@@ -7,6 +7,8 @@ import {
   IonButton,
   IonInput,
   IonIcon,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
 } from '@ionic/angular/standalone';
 import { Product } from '../models/product.model';
 import { Store } from '@ngrx/store';
@@ -27,11 +29,13 @@ import {
   increaseQuantity,
   loadGroceries,
 } from '../store/actions/grocery.action';
+import { loadCategories } from '../store/actions/category.action';
 import { RouterLink } from '@angular/router';
-import { ApiService } from '../services/api-service/api-service';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { LoggerService } from '../services/logger-service';
 import { ItemCardComponent } from '../item-card/item-card.component';
+import { AppState } from '../store';
+import { Category } from '../models/category.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,6 +49,8 @@ import { ItemCardComponent } from '../item-card/item-card.component';
     IonItem,
     IonIcon,
     IonInput,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
     RouterLink,
     ItemCardComponent,
   ],
@@ -53,6 +59,10 @@ export class DashboardPage implements OnInit {
   isScrolled = signal(false);
   groceries: Signal<Product[]> = signal<Product[]>([]);
   bucketItems: Signal<Bucket[]> = signal([]);
+  categories: Signal<Category[]> = signal<Category[]>([]);
+  currentPage = 1;
+  hasMore = signal(true);
+  isLoadingMore = signal(false);
   bucketCount = computed(() =>
     this.bucketItems().reduce((count, item) => count + item.quantity, 0),
   );
@@ -65,42 +75,9 @@ export class DashboardPage implements OnInit {
       this.selectedCategory(),
     ),
   );
-  categories: { id: number; name: string; image: string }[] = [
-    {
-      id: 1,
-      name: 'All',
-      image: './assets/icon/favicon.png',
-    },
-    {
-      id: 2,
-      name: 'Vegetables',
-      image: './assets/icon/favicon.png',
-    },
-    {
-      id: 3,
-      name: 'Fruits',
-      image: './assets/icon/favicon.png',
-    },
-    {
-      id: 4,
-      name: 'Beverages',
-      image: './assets/icon/favicon.png',
-    },
-    {
-      id: 5,
-      name: 'Dairy',
-      image: './assets/icon/favicon.png',
-    },
-    {
-      id: 6,
-      name: 'Snacks',
-      image: './assets/icon/favicon.png',
-    },
-  ];
 
   constructor(
-    private store: Store<{ groceries: Product[]; myBucket: Bucket[] }>,
-    private apiService: ApiService,
+    private store: Store<AppState>,
     private logger: LoggerService,
   ) {
     addIcons({ location, chevronDown, search, remove, trash, add, cart });
@@ -110,10 +87,29 @@ export class DashboardPage implements OnInit {
     this.bucketItems = toSignal(this.store.select('myBucket'), {
       initialValue: [],
     });
+    this.categories = toSignal(this.store.select('categories'), {
+      initialValue: [],
+    });
   }
 
   ngOnInit() {
-    this.store.dispatch(loadGroceries());
+    this.currentPage = 1;
+    this.store.dispatch(loadGroceries({ page: 1, append: false }));
+    this.store.dispatch(loadCategories());
+  }
+
+  loadMore(event: any) {
+    if (this.isLoadingMore() || !this.hasMore()) {
+      event.target.complete();
+      return;
+    }
+
+    this.isLoadingMore.set(true);
+    const nextPage = this.currentPage + 1;
+    this.store.dispatch(loadGroceries({ page: nextPage, append: true }));
+    this.currentPage = nextPage;
+    this.isLoadingMore.set(false);
+    event.target.complete();
   }
 
   onScroll(event: any) {
@@ -139,8 +135,7 @@ export class DashboardPage implements OnInit {
         !search ||
         grocery.name.toLowerCase().includes(search.toLowerCase()) ||
         grocery.description.toLowerCase().includes(search.toLowerCase());
-
-      const matchesCategory = category === 'All' || grocery.type === category;
+      const matchesCategory = category === 'All' || grocery.category === category;
 
       return matchesSearch && matchesCategory;
     });
