@@ -31,11 +31,12 @@
                 Delivering to
               </p>
 
-              <p
-                class="text-sm font-semibold text-slate-900 flex items-center gap-1 truncate max-w-[200px] md:max-w-[300px] lg:max-w-[400px]"
-              >
-                {{ selectedAddress() }}<ion-icon name="chevron-down" class="text-sm"></ion-icon>
-              </p>
+              <div class="flex items-center gap-1 max-w-[200px] md:max-w-[300px] lg:max-w-[400px]">
+                <p class="text-sm font-semibold text-slate-900 truncate">
+                  {{ selectedAddress() }}
+                </p>
+                <ion-icon name="chevron-down" class="text-sm flex-shrink-0"></ion-icon>
+              </div>
               
             </div>
           </div>
@@ -85,12 +86,12 @@
             <img
               [src]="category.image"
               [alt]="category.name"
-              class="w-10 h-10 object-contain"
+              class="w-7 h-10 object-contain"
             />
           </div>
 
           <p
-            class="mt-2 text-[15px] font-semibold text-black whitespace-nowrap"
+            class=" text-[15px] font-semibold text-black"
           >
             {{ category.title }}
           </p>

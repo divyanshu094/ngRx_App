@@ -18,10 +18,13 @@
       <p class="empty-state">
         No saved addresses yet. Tap + to add your first address.
       </p>
-      }
+      }@else if (savedAddresses().length > 0 && !showAddForm) {
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-        @for(address of savedAddresses();track address.id){
-        <div (click)="selectAddress(address)" class="flex items-start justify-between gap-3 border-b last:border-b-0 last:mb-0 border-gray-300 pb-2 mb-2">
+        @for(address of savedAddresses();track address._id){
+        <div
+          (click)="selectAddress(address)"
+          class="flex items-start justify-between gap-3 border-b last:border-b-0 last:mb-0 border-gray-300 pb-2 mb-2"
+        >
           <!-- Left -->
           <div class="flex gap-3 flex-1">
             <!-- Location Icon -->
@@ -52,24 +55,23 @@
               <p class="text-sm text-gray-500 mt-1">
                 {{ address.city }}, {{ address.state }}, {{ address.zipCode }}
               </p>
-
-              <p class="text-sm text-gray-500">{{ address.country }}</p>
             </div>
           </div>
 
           <!-- Actions -->
           <div class="flex flex-col">
-            <ion-button fill="clear" size="small" class="text-gray-500">
+            <ion-button fill="clear" size="small" class="text-gray-500" (click)="editAddress(address)">
               <ion-icon name="create-outline" slot="icon-only"> </ion-icon>
             </ion-button>
 
-            <ion-button fill="clear" size="small" color="danger">
+            <ion-button fill="clear" size="small" color="danger" (click)="deleteAddress(address)">
               <ion-icon name="trash-outline" slot="icon-only"> </ion-icon>
             </ion-button>
           </div>
         </div>
         }
       </div>
+      }
     </div>
 
     @if(showAddForm){
@@ -80,89 +82,104 @@
         <input
           #searchInput
           type="text"
+          [(ngModel)]="searchQuery"
+          (input)="searchPlaces()"
           placeholder="Search location"
           class="w-full h-10 bg-white p-4 border border-gray-300 rounded-xl shadow-lg outline-none"
         />
-        @if(platform.is('hybrid')){
+        <!-- Search Results -->
+        @if(searchResults.length){
+
+        <div class="bg-white rounded-xl mt-2 shadow-lg max-h-60 overflow-auto">
+          @for(item of searchResults; track item.place_id){
+
+          <div (click)="selectPlace(item)" class="p-3 border-b cursor-pointer">
+            {{ item.display_name }}
+          </div>
+
+          }
+        </div>
+
+        }
+        <!-- @if(platform.is('hybrid')){
         <capacitor-google-map #map id="map"> </capacitor-google-map>
         } @else {
         <div #map id="map" class="w-full h-[300px] rounded-xl"></div>
-        }
-      </div>
-      <!-- <h2 class="font-bold text-lg mb-2">Select delivery location</h2>
-
-      <p class="text-gray-600 text-sm mb-3">{{ selectedAddress }}</p> -->
-      <ion-list>
-        <ion-item>
-          <!-- <ion-label position="stacked">Street</ion-label> -->
-          <ion-input
-            [(ngModel)]="newAddress.street"
-            placeholder="Enter street"
-            required
-          ></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <!-- <ion-label position="stacked">City</ion-label> -->
-          <ion-input
-            [(ngModel)]="newAddress.city"
-            placeholder="Enter city"
-            required
-          ></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <!-- <ion-label position="stacked">State</ion-label> -->
-          <ion-input
-            [(ngModel)]="newAddress.state"
-            placeholder="Enter state"
-            required
-          ></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <!-- <ion-label position="stacked">Zip Code</ion-label> -->
-          <ion-input
-            [(ngModel)]="newAddress.zipCode"
-            placeholder="Enter zip code"
-            required
-          ></ion-input>
-        </ion-item>
-
-        <!-- <ion-item>
-          <ion-label position="stacked">Country</ion-label>
-          <ion-input
-            [(ngModel)]="newAddress.country"
-            placeholder="Enter country"
-            required
-          ></ion-input>
-        </ion-item> -->
-
-        <ion-item>
-          <!-- <ion-label position="stacked">Address Label</ion-label> -->
-          <ion-input
-            [(ngModel)]="newAddress.type"
-            placeholder="e.g. Home, Work"
-          ></ion-input>
-        </ion-item>
-      </ion-list>
-
-      <div class="form-actions">
-        <ion-button
-          expand="block"
-          color="primary"
-          (click)="saveAddress()"
-          [disabled]="!isFormValid()"
-          >Save Address</ion-button
+        } -->
+        <div
+          #map
+          id="map"
+          class="relative w-full mt-2 h-[400px] rounded-2xl overflow-hidden"
         >
-        <ion-button
-          expand="block"
-          fill="outline"
-          color="medium"
-          (click)="cancelForm()"
-          >Cancel</ion-button
-        >
+          <button
+            (click)="goToCurrentLocation()"
+            class="absolute bottom-2 left-2 z-[1000] bg-white w-14 h-14 rounded-full shadow-xl"
+          >
+            📍
+          </button>
+        </div>
       </div>
+
+      <ion-modal
+        [isOpen]="isSheetOpen()"
+        [initialBreakpoint]="0.60"
+        [breakpoints]="[0, 0.8]"
+        handle="true"
+        (didDismiss)="isSheetOpen.set(false)"
+      >
+        <ng-template>
+          <ion-content class="ion-padding">
+            <h2>Complete Address</h2>
+
+            <p class="text-gray-500 text-sm mb-4">{{ selectedAddress() }}</p>
+
+            <ion-item>
+              <ion-input
+                label="House / Flat No."
+                labelPlacement="stacked"
+                [(ngModel)]="newAddress.street"
+              >
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-input
+                label="City"
+                labelPlacement="stacked"
+                [(ngModel)]="newAddress.city"
+              >
+              </ion-input>
+            </ion-item>
+
+            <div class="mb-4">
+              <label class="block text-sm font-semibold text-gray-800 mb-2">Address Type</label>
+              <div class="flex gap-3">
+               <button
+                  *ngFor="let option of ['home', 'work', 'other']"
+                  (click)="newAddress.type = option"
+                  [ngClass]="{
+                    'bg-green-500 text-white': newAddress.type === option,
+                    'bg-gray-200 text-gray-700': newAddress.type !== option
+                  }"
+                  class="px-4 py-2 rounded-full font-semibold text-sm transition"
+                >
+                  {{ option | titlecase }}
+                </button>
+              </div>
+            </div>
+
+            <ion-button
+              expand="block"
+              color="success"
+              class="mt-4"
+              [disabled]="!isFormValid()"
+              (click)="newAddress._id ? updateAddress() : saveAddress()"
+            >
+           {{ newAddress._id ? 'Update Address' : 'Save Address' }}
+            </ion-button>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
     </div>
     }
   </div>

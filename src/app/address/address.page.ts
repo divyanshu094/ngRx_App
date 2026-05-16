@@ -12,6 +12,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Platform } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   remove,
   add,
@@ -40,6 +41,7 @@ import {
   IonList,
   IonTitle,
   IonToolbar,
+  IonModal,
 } from '@ionic/angular/standalone';
 import { RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
@@ -47,9 +49,22 @@ import { GoogleMap } from '@capacitor/google-maps';
 import { Geolocation } from '@capacitor/geolocation';
 import { ApiService } from '../services/api-service/api-service';
 declare var google: any;
-//google-key="AIzaSyD8Fg2WFdGAp0NFO1h2sMS9B6CkO4eI1dE"
-export interface Root {
-  id?: number;
+import * as L from 'leaflet';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+// import 'leaflet-routing-machine';
+export interface Address {
+  _id?: string;
   type: string;
   street: string;
   city: string;
@@ -91,6 +106,7 @@ export interface Coordinates {
     CommonModule,
     FormsModule,
     RouterLink,
+    IonModal,
   ],
 })
 export class AddressPage implements OnInit, AfterViewInit {
@@ -100,19 +116,26 @@ export class AddressPage implements OnInit, AfterViewInit {
   map: any;
   marker: any;
   geocoder: any;
-  selectedAddressId: number | null = null;
+  searchQuery = '';
+  selectedAddressId: string | undefined = '';
   selectedLat = 0;
   selectedLng = 0;
-  selectedAddress = '';
+  routingControl: any;
+  searchSubject = new Subject<string>();
+  searchResults: any[] = [];
+  selectedAddress = signal('');
   showAddForm = false;
   selectedLocation = 'test';
-  newAddress: Root = {
-    type: '',
+  reverseGeocodeTimeout: any;
+  isSheetOpen = signal(false);
+  newAddress: Address = {
+    _id: '',
+    type: 'home',
     street: '',
     city: '',
     state: '',
     zipCode: '',
-    country: 'India',
+    country: '',
     coordinates: {
       latitude: 0,
       longitude: 0,
@@ -124,6 +147,7 @@ export class AddressPage implements OnInit, AfterViewInit {
   constructor(
     protected platform: Platform,
     private apiService: ApiService,
+    private router: Router,
   ) {
     addIcons({
       arrowBack,
@@ -147,6 +171,16 @@ export class AddressPage implements OnInit, AfterViewInit {
         console.error('Error fetching addresses:', error);
       },
     });
+
+    this.searchSubject
+      .pipe(
+        debounceTime(700),
+
+        distinctUntilChanged(),
+      )
+      .subscribe((value) => {
+        this.fetchPlaces(value);
+      });
   }
 
   async ngAfterViewInit() {
@@ -171,105 +205,141 @@ export class AddressPage implements OnInit, AfterViewInit {
 
   async loadMap() {
     const coordinates = await Geolocation.getCurrentPosition();
-
     const lat = coordinates.coords.latitude;
     const lng = coordinates.coords.longitude;
-
     this.selectedLat = lat;
     this.selectedLng = lng;
+    this.map = L.map(this.mapRef.nativeElement).setView([lat, lng], 16);
+    L.circle([lat, lng], {
+      radius: 5000,
+    }).addTo(this.map);
+    // this.routingControl = (L as any).Routing.control({
+    //   waypoints: [
+    //     // L.latLng(storeLat, storeLng),
+    //     L.latLng(this.selectedLat, this.selectedLng),
+    //   ],
+    // }).addTo(this.map);
 
-    this.geocoder = new google.maps.Geocoder();
-
-    this.map = new google.maps.Map(this.mapRef.nativeElement, {
-      center: { lat, lng },
-      zoom: 16,
-      disableDefaultUI: true,
-    });
-
-    this.marker = new google.maps.Marker({
-      position: { lat, lng },
-      map: this.map,
-      draggable: true,
-      animation: google.maps.Animation.DROP,
-    });
-
-    this.reverseGeocode(lat, lng);
-
-    // Marker Drag
-    this.marker.addListener('dragend', (event: any) => {
-      const lat = event.latLng.lat();
-      const lng = event.latLng.lng();
-
-      this.selectedLat = lat;
-      this.selectedLng = lng;
-
-      this.reverseGeocode(lat, lng);
-    });
-
-    // Map Click
-    this.map.addListener('click', (event: any) => {
-      const lat = event.latLng.lat();
-      const lng = event.latLng.lng();
-
-      this.marker.setPosition({
-        lat,
-        lng,
-      });
-
-      this.selectedLat = lat;
-      this.selectedLng = lng;
-
-      this.reverseGeocode(lat, lng);
-    });
-
-    // Search Autocomplete
-    const autocomplete = new google.maps.places.Autocomplete(
-      this.searchInput.nativeElement,
+    // Dark Map
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(
+      this.map,
     );
 
-    autocomplete.bindTo('bounds', this.map);
+    const customIcon = L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+    });
 
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
+    this.marker = L.marker([lat, lng], {
+      draggable: true,
+      icon: customIcon,
+    }).addTo(this.map);
 
-      if (!place.geometry) return;
+    // Reverse Geocode
+    this.reverseGeocode(lat, lng);
 
-      const location = place.geometry.location;
+    // Map Click
+    this.map.on('click', (event: any) => {
+      const lat = event.latlng.lat;
 
-      const lat = location.lat();
-      const lng = location.lng();
+      const lng = event.latlng.lng;
 
-      this.map.panTo({
-        lat,
-        lng,
-      });
+      this.updateLocation(lat, lng);
+    });
 
-      this.map.setZoom(16);
+    // Marker Drag
+    this.marker.on('dragend', (event: any) => {
+      const pos = event.target.getLatLng();
 
-      this.marker.setPosition({
-        lat,
-        lng,
-      });
-
-      this.selectedLat = lat;
-      this.selectedLng = lng;
-
-      this.selectedAddress = place.formatted_address;
+      this.updateLocation(pos.lat, pos.lng);
     });
   }
 
-  reverseGeocode(lat: number, lng: number) {
-    this.geocoder.geocode(
-      {
-        location: { lat, lng },
-      },
+  updateLocation(lat: number, lng: number) {
+    this.selectedLat = lat;
+    this.selectedLng = lng;
 
-      (results: any, status: any) => {
-        if (status === 'OK' && results[0]) {
-          this.selectedAddress = results[0].formatted_address;
-        }
-      },
+    this.marker.setLatLng([lat, lng]);
+    console.log(lat, lng);
+    // this.reverseGeocode(lat, lng);
+    clearTimeout(this.reverseGeocodeTimeout);
+
+    this.reverseGeocodeTimeout = setTimeout(() => {
+      this.reverseGeocode(lat, lng);
+      this.isSheetOpen.set(true);
+    }, 500);
+  }
+
+  async reverseGeocode(lat: number, lng: number) {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+
+    const response = await fetch(
+      `https://corsproxy.io/?${encodeURIComponent(url)}`,
     );
+
+    const data = await response.json();
+    console.log(data);
+    this.selectedAddress.set(data.display_name);
+
+    // this.newAddress.street = data.address.road || '';
+
+    // this.newAddress.city =
+    //   data.address.city || data.address.town || data.address.village || '';
+
+    this.newAddress.state = data.address.state || '';
+
+    this.newAddress.zipCode = data.address.postcode || '';
+  }
+
+  searchPlaces() {
+    this.searchSubject.next(this.searchQuery);
+  }
+
+  async fetchPlaces(query: string) {
+    if (!query.trim()) {
+      this.searchResults = [];
+
+      return;
+    }
+
+    try {
+      const enhancedQuery = `${query}, India`;
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(enhancedQuery)}&limit=5`,
+      );
+
+      this.searchResults = await response.json();
+      console.log(this.searchResults);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  selectPlace(place: any) {
+    const lat = parseFloat(place.lat);
+
+    const lng = parseFloat(place.lon);
+
+    this.map.flyTo([lat, lng], 16);
+
+    this.updateLocation(lat, lng);
+
+    this.searchResults = [];
+
+    this.searchQuery = place.display_name;
+  }
+
+  async goToCurrentLocation() {
+    const coordinates = await Geolocation.getCurrentPosition();
+
+    const lat = coordinates.coords.latitude;
+
+    const lng = coordinates.coords.longitude;
+
+    this.map.flyTo([lat, lng], 16);
+
+    this.updateLocation(lat, lng);
   }
 
   saveAddress() {
@@ -284,8 +354,8 @@ export class AddressPage implements OnInit, AfterViewInit {
       zipCode: this.newAddress.zipCode,
       country: this.newAddress.country,
       coordinates: {
-        latitude: 0,
-        longitude: 0,
+        latitude: this.selectedLat,
+        longitude: this.selectedLng,
       },
       isDefault: true,
     };
@@ -326,12 +396,12 @@ export class AddressPage implements OnInit, AfterViewInit {
     const lat = (10 + (y / rect.height) * 10).toFixed(5);
     const lng = (76 + (x / rect.width) * 10).toFixed(5);
     this.selectedLocation = `${lat}, ${lng}`;
-    this.newAddress.type = `Lat ${lat}, Lng ${lng}`;
+    // this.newAddress.type = `Lat ${lat}, Lng ${lng}`;
   }
 
   private resetForm() {
     this.newAddress = {
-      type: '',
+      type: 'home',
       street: '',
       city: '',
       state: '',
@@ -347,7 +417,78 @@ export class AddressPage implements OnInit, AfterViewInit {
   }
 
   selectAddress(address: any) {
-    this.selectedAddressId = address.id;
+    this.selectedAddressId = address._id;
     localStorage.setItem('selectedAddress', JSON.stringify(address));
+    this.router.navigate(['/dashboard']);
+  }
+
+  editAddress(address: Address) {
+    this.loadMap();
+    this.newAddress = {
+      _id: address._id,
+      type: address.type,
+      street: address.street,
+      city: address.city,
+      state: address.state,
+      zipCode: address.zipCode,
+      country: address.country,
+      coordinates: {
+        latitude: this.selectedLat,
+        longitude: this.selectedLng,
+      },
+      isDefault: false,
+    };
+    this.showAddForm = true;
+    this.isSheetOpen.set(true);
+    this.updateLocation(
+      address.coordinates.latitude,
+      address.coordinates.longitude,
+    );
+  }
+
+  deleteAddress(address: Address) {
+    this.apiService.deleteData(`addresses/${address._id}`, {}).subscribe({
+      next: (response) => {
+        this.savedAddresses.update((addresses) =>
+          addresses.filter((addr) => addr._id !== address._id),
+        );
+        console.log('Address deleted successfully:', response);
+      },
+      error: (error) => {
+        console.error('Error deleting address:', error);
+      },
+    });
+  }
+
+  updateAddress() {
+    if (!this.isFormValid()) {
+      return;
+    }
+
+    let addresJson = { ...this.newAddress };
+    delete addresJson._id;
+    this.apiService
+      .updateData(`addresses/${this.newAddress._id}`, addresJson)
+      .subscribe({
+        next: (response) => {
+          this.savedAddresses.update((addresses) =>
+            addresses.map((addr) => (addr._id === this.newAddress._id ? { ...addr, ...this.newAddress } : addr)),
+          );
+          console.log('Address updated successfully:', response);
+          this.toggleAddForm();
+        },
+        error: (error) => {
+          console.error('Error updating address:', error);
+        },
+      });
+  }
+
+  ionViewWillLeave() {
+    this.showAddForm = false;
+    this.isSheetOpen.set(false);
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
   }
 }
