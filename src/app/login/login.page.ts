@@ -69,7 +69,7 @@ export class LoginPage implements OnInit {
           if (response.user) {
             localStorage.setItem('user', JSON.stringify(response.user));
           }
-          this.router.navigate(['/dashboard']);
+          this.router.navigateByUrl('/dashboard', { replaceUrl: true });
         } else {
           this.errorMessage.set(response.message || 'Login failed');
         }

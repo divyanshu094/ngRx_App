@@ -204,6 +204,7 @@ export class AddressPage implements OnInit, AfterViewInit {
   }
 
   async loadMap() {
+     await Geolocation.requestPermissions();
     const coordinates = await Geolocation.getCurrentPosition();
     const lat = coordinates.coords.latitude;
     const lng = coordinates.coords.longitude;
@@ -317,6 +318,10 @@ export class AddressPage implements OnInit, AfterViewInit {
   }
 
   selectPlace(place: any) {
+     if (!this.map) {
+    console.error('Map not initialized');
+    return;
+  }
     const lat = parseFloat(place.lat);
 
     const lng = parseFloat(place.lon);

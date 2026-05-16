@@ -48,6 +48,7 @@ import { PaymentService } from '../services/payment.service';
 })
 export class CartPage implements OnInit {
   bucketItems: Signal<Bucket[]> = signal([]);
+  selectedAddress = signal('');
   totalPrice = computed(() =>
     this.bucketItems().reduce(
       (total, item) =>
@@ -77,6 +78,17 @@ export class CartPage implements OnInit {
 
   ngOnInit() {
     // No need for ngOnInit since toSignal handles it
+  }
+
+  ionViewWillEnter() {
+    const savedAddress = localStorage.getItem('selectedAddress');
+    if (savedAddress) {
+      const address = JSON.parse(savedAddress);
+
+      this.selectedAddress.set(
+        `${address.type} - ${address.street}, ${address.city}`,
+      );
+    }
   }
 
   increment(item: Bucket) {
