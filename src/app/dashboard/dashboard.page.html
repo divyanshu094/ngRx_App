@@ -1,4 +1,8 @@
-<ion-content [scrollEvents]="true" (ionScroll)="onScroll($event)">
+<ion-content
+  [scrollEvents]="true"
+  (ionScroll)="onScroll($event)"
+  fullscreen="false"
+>
   <div class="mx-auto max-w-6xl bg-orange-300 min-h-screen">
     <!-- STICKY SEARCH ONLY -->
     <div
@@ -13,32 +17,50 @@
         [class.max-h-[120px]]="!isScrolled()"
         [class.opacity-100]="!isScrolled()"
       >
-        <div
-          class="mb-3 flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
-        >
+        <div class="mb-3 flex items-center justify-between">
+          <!-- Left Section -->
           <div class="flex items-center gap-3">
-            <div
+            <!-- <div
               class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center"
             >
               <ion-icon
                 name="location"
                 class="text-emerald-600 text-xl"
               ></ion-icon>
-            </div>
+            </div> -->
 
-            <div routerLink="/address" class="cursor-pointer">
+            <div routerLink="/address" class="cursor-pointer ml-2">
               <p class="font-bold text-black uppercase tracking-wide">
+                <ion-icon
+                  name="location"
+                ></ion-icon>
                 Delivering to
               </p>
 
-              <div class="flex items-center gap-1 max-w-[200px] md:max-w-[300px] lg:max-w-[400px]">
-                <p class="text-sm font-semibold text-slate-900 truncate">
+              <div
+                class="flex items-center gap-1 max-w-[200px] md:max-w-[300px] lg:max-w-[400px]"
+              >
+                <p class="text-sm font-semibold text-slate-900 truncate capitalize">
                   {{ selectedAddress() }}
                 </p>
-                <ion-icon name="chevron-down" class="text-sm flex-shrink-0"></ion-icon>
+
+                <ion-icon
+                  name="chevron-down"
+                  class="text-xl flex-shrink-0"
+                ></ion-icon>
               </div>
-              
             </div>
+          </div>
+
+          <!-- Right Icon -->
+          <div
+            class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center"
+          >
+            <ion-icon
+              routerLink="/profile"
+              name="person-circle"
+              class="text-pink-600 text-4xl"
+            ></ion-icon>
           </div>
         </div>
       </div>
@@ -90,9 +112,7 @@
             />
           </div>
 
-          <p
-            class=" text-[15px] font-semibold text-black"
-          >
+          <p class="text-[15px] font-semibold text-black">
             {{ category.title }}
           </p>
 
@@ -109,7 +129,7 @@
 
     <!-- PRODUCTS -->
     <div
-      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-2 pb-32 mt-2"
+      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 px-2 pb-32 mt-2"
     >
       @for (item of filteredGroceries(); track item.id) {
 

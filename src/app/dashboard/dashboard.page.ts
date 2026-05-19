@@ -21,6 +21,7 @@ import {
   search,
   location,
   chevronDown,
+  personCircle,
 } from 'ionicons/icons';
 import { addToBucket, removeFromBucket } from '../store/actions/bucket.action';
 import { Bucket } from '../models/bucket.model';
@@ -81,7 +82,7 @@ export class DashboardPage implements OnInit {
     private store: Store<AppState>,
     private logger: LoggerService,
   ) {
-    addIcons({ location, chevronDown, search, remove, trash, add, cart });
+    addIcons({ location, chevronDown, search, remove, trash, add, cart, personCircle });
     this.groceries = toSignal(this.store.select('groceries'), {
       initialValue: [],
     });

@@ -1,4 +1,4 @@
-<ion-content fullscreen>
+<ion-content fullscreen="false">
   <div
     class="mx-auto max-w-4xl px-4 bg-orange-300 py-3 h-screen overflow-auto pb-20"
   >
@@ -100,7 +100,7 @@
             </div>
             <div class="flex justify-between text-sm">
               <span class="text-slate-600">Delivery Fee</span>
-              <span class="text-slate-900 font-medium"
+              <span class="text-slate-600 font-medium line-through"
                 >{{ deliveryFee() |currency:'INR':'symbol' }}</span
               >
             </div>
@@ -130,7 +130,7 @@
           <div class="flex flex-col">
             <span class="text-sm font-semibold text-black"> Delivering To </span>
 
-            <span class="text-xs text-black"> {{ selectedAddress() }} </span>
+            <span class="text-xs text-black capitalize"> {{ selectedAddress() }} </span>
           </div>
 
           <!-- Right -->

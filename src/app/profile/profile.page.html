@@ -1,0 +1,187 @@
+<ion-content fullscreen="false">
+  <!-- Profile Header -->
+  <div class="mx-auto max-w-4xl px-4 py-3 h-screen overflow-auto pb-20">
+    <!-- Cart Header -->
+    <div>
+      <div class="flex items-center gap-3 mb-4">
+        <ion-button fill="clear" routerLink="/dashboard" class="text-black">
+          <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
+        </ion-button>
+        <h1 class="text-2xl font-bold text-slate-900">My Profile</h1>
+      </div>
+    </div>
+
+    <!-- User Info -->
+    <div class="px-4">
+      <div class="flex items-center gap-4">
+        <div
+          class="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center"
+        >
+          <ion-icon name="person" class="text-4xl text-purple-600"></ion-icon>
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-bold text-black">{{user().name}}</h2>
+
+          <p class="text-gray-500 text-base mt-1">{{user().phone}}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-3 gap-3 px-4 mt-6">
+      <div
+        class="bg-white rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm" routerLink="/order-history"
+      >
+        <ion-icon
+          name="bag-outline"
+          class="text-3xl text-black mb-3"
+        ></ion-icon>
+
+        <span class="text-center font-semibold text-[15px] leading-6">
+          Your Orders
+        </span>
+      </div>
+
+      <div
+        class="bg-white rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm"
+      >
+        <ion-icon
+          name="chatbubble-ellipses-outline"
+          class="text-3xl text-black mb-3"
+        ></ion-icon>
+
+        <span class="text-center font-semibold text-[15px] leading-6">
+          Help & Support
+        </span>
+      </div>
+
+      <div
+        class="bg-white rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm"
+      >
+        <ion-icon
+          name="heart-outline"
+          class="text-3xl text-black mb-3"
+        ></ion-icon>
+
+        <span class="text-center font-semibold text-[15px] leading-6">
+          Your Wishlist
+        </span>
+      </div>
+    </div>
+
+    <!-- Information Section -->
+    <div class="px-4 mt-10">
+      <h2 class="text-3xl font-bold text-black mb-5">Your Information</h2>
+
+      <div class="bg-white rounded-3xl overflow-hidden shadow-sm">
+        <!-- Item -->
+        <div class="flex items-center justify-between px-5 py-5 border-b border-dashed border-gray-200" routerLink="/address">
+          <div class="flex items-center gap-4">
+            <ion-icon
+              name="location-outline"
+              class="text-2xl text-black"
+            ></ion-icon>
+
+            <div>
+              <h4 class="text-[17px] font-semibold text-black">
+                Saved Addresses
+              </h4>
+
+              <p class="text-sm text-gray-500 mt-1">4 Addresses</p>
+            </div>
+          </div>
+
+          <ion-icon
+            name="chevron-forward-outline"
+            class="text-xl text-gray-500"
+          ></ion-icon>
+        </div>
+
+        <!-- Item -->
+        <div
+          class="flex items-center justify-between px-5 py-5 border-b border-dashed border-gray-200"
+        >
+          <div class="flex items-center gap-4">
+            <ion-icon
+              name="cash-outline"
+              class="text-2xl text-black"
+            ></ion-icon>
+
+            <span class="text-[17px] font-semibold text-black">
+              Your Refunds
+            </span>
+          </div>
+
+          <ion-icon
+            name="chevron-forward-outline"
+            class="text-xl text-gray-500"
+          ></ion-icon>
+        </div>
+
+        <!-- Item -->
+        <div
+          class="flex items-center justify-between px-5 py-5 border-b border-dashed border-gray-200"
+        >
+          <div class="flex items-center gap-4">
+            <ion-icon
+              name="heart-outline"
+              class="text-2xl text-black"
+            ></ion-icon>
+
+            <span class="text-[17px] font-semibold text-black">
+              Your Wishlist
+            </span>
+          </div>
+
+          <ion-icon
+            name="chevron-forward-outline"
+            class="text-xl text-gray-500"
+          ></ion-icon>
+        </div>
+
+        <!-- Item -->
+        <div
+          class="flex items-center justify-between px-5 py-5 border-b border-dashed border-gray-200"
+        >
+          <div class="flex items-center gap-4">
+            <ion-icon
+              name="gift-outline"
+              class="text-2xl text-black"
+            ></ion-icon>
+
+            <span class="text-[17px] font-semibold text-black">
+              E-Gift Cards
+            </span>
+          </div>
+
+          <ion-icon
+            name="chevron-forward-outline"
+            class="text-xl text-gray-500"
+          ></ion-icon>
+        </div>
+
+        <!-- Item -->
+        <div
+          class="flex items-center justify-between px-5 py-5"
+        >
+          <div class="flex items-center gap-4">
+            <ion-icon
+              name="chatbubble-ellipses-outline"
+              class="text-2xl text-black"
+            ></ion-icon>
+
+            <span class="text-[17px] font-semibold text-black">
+              Help & Support
+            </span>
+          </div>
+
+          <ion-icon
+            name="chevron-forward-outline"
+            class="text-xl text-gray-500"
+          ></ion-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

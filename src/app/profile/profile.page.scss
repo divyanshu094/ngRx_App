@@ -1,0 +1,50 @@
+.profile-content {
+  padding: 1rem;
+}
+
+.profile-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fdf2f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #2d3748;
+}
+
+.profile-details h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.profile-details p {
+  margin: 0.2rem 0;
+  color: #334155;
+}
+
+.section-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.orders-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.order-card {
+  margin-bottom: 1rem;
+}

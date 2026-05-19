@@ -10,21 +10,10 @@ export class PaymentService {
   constructor(private http: HttpClient) {}
 
   payNow(amount: number) {
-    let token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTAwNTM2MzQzMmY3YzZjMzc4MGI0NjUiLCJpc0FkbWluIjpmYWxzZSwiaXNEZWxpdmVyeVBhcnRuZXIiOmZhbHNlLCJpYXQiOjE3Nzg0MDYzNTgsImV4cCI6MTc3OTAxMTE1OH0.PEc47X8YsRzcw4O1J3_ze0LKubOk9C1l4ekMVoeusP0';
-
     this.http
       .post<any>(
         'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/create-order',
         { amount },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            'ngrok-skip-browser-warning': 'true',
-          },
-        },
       )
       .subscribe({
         next: (order) => {
@@ -38,7 +27,15 @@ export class PaymentService {
 
             handler: (response: any) => {
               console.log('PAYMENT SUCCESS', response);
-              alert('Payment Successful');
+              this.placeOrder(response, amount).subscribe({
+                next: (result) => {
+                  console.log('ORDER PLACED', result);
+                },
+                error: (orderErr) => {
+                  console.error('ORDER PLACEMENT FAILED', orderErr);
+                  alert('Payment succeeded, but placing order failed.');
+                },
+              });
             },
 
             prefill: {
@@ -63,7 +60,7 @@ export class PaymentService {
   }
 
   // payViaUPI(app: string, amount: number) {
-    
+
   //   this.createOrder((order: any, amount: number) => {
   //     const options = {
   //       key: order.key,
@@ -107,22 +104,22 @@ export class PaymentService {
   //   });
   // }
 
-  verifyPayment(data: any) {
-    let token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTAwNTM2MzQzMmY3YzZjMzc4MGI0NjUiLCJpc0FkbWluIjpmYWxzZSwiaXNEZWxpdmVyeVBhcnRuZXIiOmZhbHNlLCJpYXQiOjE3Nzg0MDYzNTgsImV4cCI6MTc3OTAxMTE1OH0.PEc47X8YsRzcw4O1J3_ze0LKubOk9C1l4ekMVoeusP0';
+  placeOrder(paymentResponse: any, amount: number) {
+    const body = {
+      amount,
+      paymentId: paymentResponse.razorpay_payment_id,
+      orderId: paymentResponse.razorpay_order_id,
+      signature: paymentResponse.razorpay_signature,
+    };
 
+    return this.http.post('api/orders', body);
+  }
+
+  verifyPayment(data: any) {
     this.http
       .post(
         'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/verify-payment',
         data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            'ngrok-skip-browser-warning': 'true',
-          },
-        },
       )
       .subscribe((res) => {
         console.log(res);
@@ -130,23 +127,15 @@ export class PaymentService {
   }
 
   createOrder(callback: any, amount: number) {
-    let token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTAwNTM2MzQzMmY3YzZjMzc4MGI0NjUiLCJpc0FkbWluIjpmYWxzZSwiaXNEZWxpdmVyeVBhcnRuZXIiOmZhbHNlLCJpYXQiOjE3Nzg0MDYzNTgsImV4cCI6MTc3OTAxMTE1OH0.PEc47X8YsRzcw4O1J3_ze0LKubOk9C1l4ekMVoeusP0';
-
     this.http
       .post<any>(
         'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/create-order',
         {
           amount: amount,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
       )
       .subscribe((order) => {
-        callback(order,amount);
+        callback(order, amount);
       });
   }
 }

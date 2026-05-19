@@ -15,6 +15,10 @@ export const routes: Routes = [
     loadComponent: () => import('./dashboard/dashboard.page').then( m => m.DashboardPage)
   },
   {
+    path: 'profile',
+    loadComponent: () => import('./profile/profile.page').then( m => m.ProfilePage)
+  },
+  {
     path: 'cart',
     loadComponent: () => import('./cart/cart.page').then( m => m.CartPage)
   },
@@ -35,7 +39,12 @@ export const routes: Routes = [
     loadComponent: () => import('./address/address.page').then( m => m.AddressPage)
   },
   {
+    path: 'order-history',
+    loadComponent: () => import('./order-history/order-history.page').then( m => m.OrderHistoryPage)
+  },
+  {
     path: '**',
     redirectTo: 'login'
   }
+
 ];
