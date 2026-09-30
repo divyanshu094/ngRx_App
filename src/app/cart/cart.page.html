@@ -134,8 +134,8 @@
           </div>
 
           <!-- Right -->
-          <ion-button fill="solid" color="primary" (click)="initiatePayment()">
-            Pay {{grandTotal() | currency:'INR':'symbol' }}
+          <ion-button fill="solid" color="primary" routerLink="/checkout">
+            Checkout · {{grandTotal() | currency:'INR':'symbol' }}
           </ion-button>
         </div>
       </div>

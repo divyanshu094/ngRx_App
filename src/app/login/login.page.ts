@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonContent, IonItem, IonButton, IonLabel, IonInput, IonIcon, IonCheckbox } from '@ionic/angular/standalone';
-import { RouterLink, Router } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { leaf, mail, lockClosed, logIn, mailOutline, lockClosedOutline, eyeOffOutline, eyeOutline } from 'ionicons/icons';
 import { ApiService } from '../services/api-service/api-service';
@@ -24,7 +24,8 @@ export class LoginPage implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private apiService: ApiService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
   ) {
     addIcons({mailOutline,lockClosedOutline,eyeOffOutline,eyeOutline,leaf,mail,lockClosed,logIn});
   }
@@ -61,15 +62,19 @@ export class LoginPage implements OnInit {
 
     this.apiService.postData("auth/login",loginData).subscribe({
       next: (response) => {
-        if (response.success) {
-          // Store token if available
-          if (response.token) {
-            localStorage.setItem('authToken', response.token);
+        if (response?.success && response.token) {
+          localStorage.setItem('authToken', response.token);
+          if (response.refreshToken) {
+            localStorage.setItem('refreshToken', response.refreshToken);
           }
           if (response.user) {
             localStorage.setItem('user', JSON.stringify(response.user));
           }
-          this.router.navigateByUrl('/dashboard', { replaceUrl: true });
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          const destination = returnUrl?.startsWith('/') && !returnUrl.startsWith('//')
+            ? returnUrl
+            : '/dashboard';
+          this.router.navigateByUrl(destination, { replaceUrl: true });
         } else {
           this.errorMessage.set(response.message || 'Login failed');
         }

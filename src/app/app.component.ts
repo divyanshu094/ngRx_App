@@ -2,7 +2,8 @@
 import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { Platform, ToastController, NavController } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter, take } from 'rxjs';
 import { addIcons } from 'ionicons';
 import { mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, heartOutline, heartSharp, archiveOutline, archiveSharp, trashOutline, trashSharp, warningOutline, warningSharp, bookmarkOutline, bookmarkSharp } from 'ionicons/icons';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
@@ -62,11 +63,18 @@ export class AppComponent {
   initializeAppHandlers() {
     // On app start redirect to dashboard if token exists
     this.platform.ready().then(() => {
-      const token = localStorage.getItem('authToken');
-      const cur = this.router.url || '/';
-      if (token && (cur === '/' || cur === '/login' || cur === '')) {
-        this.router.navigateByUrl('/dashboard', { replaceUrl: true });
-      }
+      this.router.events
+        .pipe(
+          filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+          take(1),
+        )
+        .subscribe((event) => {
+          const token = localStorage.getItem('authToken');
+          const currentUrl = event.urlAfterRedirects;
+          if (token && (currentUrl === '/' || currentUrl.startsWith('/login'))) {
+            this.router.navigateByUrl('/dashboard', { replaceUrl: true });
+          }
+        });
 
       // Native back button handling
       this.platform.backButton.subscribeWithPriority(10, async () => {

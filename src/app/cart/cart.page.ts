@@ -37,7 +37,6 @@ import {
   increaseQuantity,
 } from '../store/actions/grocery.action';
 import { RouterLink } from '@angular/router';
-import { PaymentService } from '../services/payment.service';
 
 @Component({
   selector: 'app-cart',
@@ -66,10 +65,7 @@ export class CartPage implements OnInit {
   );
   hasItems = computed(() => this.bucketItems().length > 0);
 
-  constructor(
-    private store: Store<{ myBucket: Bucket[] }>,
-    private paymentService: PaymentService,
-  ) {
+  constructor(private store: Store<{ myBucket: Bucket[] }>) {
     addIcons({ arrowBack, remove, add, bagCheck, cart, trash });
     this.bucketItems = toSignal(this.store.select('myBucket'), {
       initialValue: [],
@@ -126,10 +122,4 @@ export class CartPage implements OnInit {
     this.store.dispatch(decreaseQuantity({ payload: { id: item.id } }));
   }
 
-  async initiatePayment() {
-    // const paymentService = inject(PaymentService);
-    // const total = this.grandTotal();
-    this.paymentService.payNow(this.grandTotal()); // Using the computed grand total
-    // this.paymentService.payViaUPI('phonepe', this.grandTotal());
-  }
 }

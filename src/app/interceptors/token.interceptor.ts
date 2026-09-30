@@ -13,7 +13,9 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
 
   // Skip login/register APIs
   const isPublicApi =
-    req.url.includes('/login') || req.url.includes('/register');
+    req.url.includes('/auth/login') ||
+    req.url.includes('/auth/register') ||
+    req.url.includes('/auth/refresh-token');
 
   let modifiedReq = req;
 
@@ -33,9 +35,13 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       // Handle unauthorized
       if (error.status === 401) {
-        localStorage.removeItem('token');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
 
-        router.navigate(['/login']);
+        if (!router.url.startsWith('/login')) {
+          router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
+        }
       }
 
       return throwError(() => error);

@@ -1,7 +1,34 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Capacitor } from '@capacitor/core';
+import { Checkout } from 'capacitor-razorpay';
+import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
-declare var RazorpayCheckout: any;
+export interface RazorpayOrder {
+  success: boolean;
+  orderId: string;
+  amount: number;
+  currency: string;
+  key: string;
+}
+
+export interface RazorpayPaymentResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+interface RazorpayCheckoutInstance {
+  open(): void;
+  on?(event: string, callback: (response: any) => void): void;
+}
+
+declare global {
+  interface Window {
+    Razorpay?: new (options: Record<string, any>) => RazorpayCheckoutInstance;
+  }
+}
 
 @Injectable({
   providedIn: 'root',
@@ -9,133 +36,79 @@ declare var RazorpayCheckout: any;
 export class PaymentService {
   constructor(private http: HttpClient) {}
 
-  payNow(amount: number) {
-    this.http
-      .post<any>(
-        'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/create-order',
-        { amount },
-      )
-      .subscribe({
-        next: (order) => {
-          const options: any = {
-            key: 'rzp_test_SnbCPs0ToCgYZb',
-            amount: order.amount,
-            currency: 'INR',
-            name: 'Softiqo Store',
-            description: 'Shopping Payment',
-            order_id: order.id,
-
-            handler: (response: any) => {
-              console.log('PAYMENT SUCCESS', response);
-              this.placeOrder(response, amount).subscribe({
-                next: (result) => {
-                  console.log('ORDER PLACED', result);
-                },
-                error: (orderErr) => {
-                  console.error('ORDER PLACEMENT FAILED', orderErr);
-                  alert('Payment succeeded, but placing order failed.');
-                },
-              });
-            },
-
-            prefill: {
-              email: 'customer@test.com',
-              contact: '9999999999',
-            },
-
-            theme: {
-              color: '#16a34a',
-            },
-          };
-
-          const rzp = new (window as any).Razorpay(options);
-          rzp.open();
-        },
-
-        error: (err) => {
-          console.log(err);
-          alert('Order creation failed');
-        },
-      });
+  createRazorpayOrder(orderId: string): Observable<RazorpayOrder> {
+    return this.http.post<RazorpayOrder>(
+      `${environment.apiUrl}payments/razorpay/create-order`,
+      { orderId },
+    );
   }
 
-  // payViaUPI(app: string, amount: number) {
-
-  //   this.createOrder((order: any, amount: number) => {
-  //     const options = {
-  //       key: order.key,
-
-  //       amount: order.amount,
-
-  //       currency: order.currency,
-
-  //       order_id: order.orderId,
-
-  //       name: 'Softiqo Store',
-
-  //       description: 'Order Payment',
-
-  //       method: {
-  //         upi: true,
-  //       },
-
-  //       upi: {
-  //         flow: 'intent',
-  //       },
-
-  //       external: {
-  //         wallets: ['phonepe', 'gpay', 'paytm'],
-  //       },
-
-  //       handler: (response: any) => {
-  //         console.log(response);
-
-  //         this.verifyPayment(response);
-  //       },
-
-  //       theme: {
-  //         color: '#16a34a',
-  //       },
-  //     };
-
-  //     const rzp = new (window as any).Razorpay(options);
-
-  //     rzp.open();
-  //   });
-  // }
-
-  placeOrder(paymentResponse: any, amount: number) {
-    const body = {
-      amount,
-      paymentId: paymentResponse.razorpay_payment_id,
-      orderId: paymentResponse.razorpay_order_id,
-      signature: paymentResponse.razorpay_signature,
-    };
-
-    return this.http.post('api/orders', body);
+  verifyRazorpayPayment(
+    payment: RazorpayPaymentResponse & { orderId: string },
+  ): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
+      `${environment.apiUrl}payments/razorpay/verify`,
+      payment,
+    );
   }
 
-  verifyPayment(data: any) {
-    this.http
-      .post(
-        'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/verify-payment',
-        data,
-      )
-      .subscribe((res) => {
-        console.log(res);
-      });
-  }
+  openCheckout(options: Record<string, any>): Promise<RazorpayPaymentResponse> {
+    if (Capacitor.isNativePlatform()) {
+      return this.openNativeCheckout(options);
+    }
 
-  createOrder(callback: any, amount: number) {
-    this.http
-      .post<any>(
-        'https://extras-wanting-unlatch.ngrok-free.dev/api/payments/razorpay/create-order',
-        {
-          amount: amount,
+    return new Promise((resolve, reject) => {
+      if (!window.Razorpay) {
+        reject(new Error('Payment checkout could not be loaded. Check your internet connection.'));
+        return;
+      }
+
+      let settled = false;
+      const finish = (callback: () => void) => {
+        if (settled) return;
+        settled = true;
+        callback();
+      };
+
+      const checkout = new window.Razorpay({
+        ...options,
+        handler: (response: RazorpayPaymentResponse) => {
+          finish(() => resolve(response));
         },
-      )
-      .subscribe((order) => {
-        callback(order, amount);
+        modal: {
+          ondismiss: () => finish(() => reject(new Error('Payment cancelled.'))),
+        },
       });
+
+      checkout.on?.('payment.failed', (response) => {
+        const message = response?.error?.description || 'Payment failed.';
+        finish(() => reject(new Error(message)));
+      });
+
+      checkout.open();
+    });
+  }
+
+  private async openNativeCheckout(
+    options: Record<string, any>,
+  ): Promise<RazorpayPaymentResponse> {
+    try {
+      const result = await Checkout.open({
+        ...options,
+        amount: String(options['amount']),
+      } as { key: string; amount: string });
+      const response = typeof result.response === 'string'
+        ? JSON.parse(result.response)
+        : result.response;
+      return response as RazorpayPaymentResponse;
+    } catch (error: any) {
+      let message = error?.message || 'Payment failed.';
+      try {
+        message = JSON.parse(message).description || message;
+      } catch {
+        // Keep the plugin's original error message.
+      }
+      throw new Error(message);
+    }
   }
 }

@@ -11,3 +11,5 @@ export const removeFromBucket = createAction(
     "[Bucket] Remove",
     props<{ payload:Partial<Bucket> }>()
 )
+
+export const clearBucket = createAction("[Bucket] Clear");

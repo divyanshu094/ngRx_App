@@ -12,7 +12,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Platform } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   remove,
   add,
@@ -148,6 +148,7 @@ export class AddressPage implements OnInit, AfterViewInit {
     protected platform: Platform,
     private apiService: ApiService,
     private router: Router,
+    private route: ActivatedRoute,
   ) {
     addIcons({
       arrowBack,
@@ -367,9 +368,8 @@ export class AddressPage implements OnInit, AfterViewInit {
 
     this.apiService.postData('addresses', address).subscribe({
       next: (response) => {
-        this.savedAddresses.update((addresses) => [address, ...addresses]);
-        // console.log('Address saved successfully:', response);
-        this.toggleAddForm();
+        this.savedAddresses.update((addresses) => [response.address, ...addresses]);
+        this.selectAddress(response.address);
       },
       error: (error) => {
         console.error('Error saving address:', error);
@@ -424,7 +424,8 @@ export class AddressPage implements OnInit, AfterViewInit {
   selectAddress(address: any) {
     this.selectedAddressId = address._id;
     localStorage.setItem('selectedAddress', JSON.stringify(address));
-    this.router.navigate(['/dashboard']);
+    const returnTo = this.route.snapshot.queryParamMap.get('returnTo');
+    this.router.navigateByUrl(returnTo === 'checkout' ? '/checkout' : '/dashboard');
   }
 
   editAddress(address: Address) {

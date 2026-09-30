@@ -1,6 +1,6 @@
 import { createReducer, on } from "@ngrx/store";
 import { Bucket } from "src/app/models/bucket.model";
-import { addToBucket, removeFromBucket } from "../actions/bucket.action";
+import { addToBucket, clearBucket, removeFromBucket } from "../actions/bucket.action";
 
 
 const initialState: Bucket[] = []
@@ -29,5 +29,6 @@ export const bucketReducer = createReducer(
         } else {
             return state.filter(item => item.id !== action.payload.id)
         }
-    })
+    }),
+    on(clearBucket, () => [])
 );
