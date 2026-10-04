@@ -9,6 +9,18 @@ const requireAuth: CanActivateFn = (_route, state) => {
   return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
 };
 
+const requireDeliveryPartner: CanActivateFn = () => {
+  const router = inject(Router);
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return localStorage.getItem('authToken') && user.isDeliveryPartner
+      ? true
+      : router.createUrlTree(['/dashboard']);
+  } catch {
+    return router.createUrlTree(['/dashboard']);
+  }
+};
+
 export const routes: Routes = [
   {
     path: '',
@@ -18,6 +30,14 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () => import('./login/login.page').then( m => m.LoginPage)
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () => import('./forgot-password/forgot-password.page').then((module) => module.ForgotPasswordPage)
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./forgot-password/forgot-password.page').then((module) => module.ForgotPasswordPage)
   },
   {
     path: 'dashboard',
@@ -56,6 +76,16 @@ export const routes: Routes = [
     path: 'order-history',
     canActivate: [requireAuth],
     loadComponent: () => import('./order-history/order-history.page').then( m => m.OrderHistoryPage)
+  },
+  {
+    path: 'payment-history',
+    canActivate: [requireAuth],
+    loadComponent: () => import('./payment-history/payment-history.page').then((module) => module.PaymentHistoryPage),
+  },
+  {
+    path: 'delivery',
+    canActivate: [requireAuth, requireDeliveryPartner],
+    loadComponent: () => import('./delivery/delivery.page').then((module) => module.DeliveryPage),
   },
   {
     path: '**',

@@ -11,6 +11,9 @@ import { isDevMode } from '@angular/core';
 import { reducers } from './app/store';
 import { GroceryEffects } from './app/store/effects/grocery.effects';
 import { CategoryEffects } from './app/store/effects/category.effects';
+import { AuthEffects } from './app/store/effects/auth.effects';
+import { OrderEffects } from './app/store/effects/order.effects';
+import { PaymentEffects } from './app/store/effects/payment.effects';
 import { hydrationMetaReducer } from './app/store/reducers/meta.reducer';
 import { tokenInterceptor } from './app/interceptors/token.interceptor';
 
@@ -24,7 +27,7 @@ bootstrapApplication(AppComponent, {
      reducers,
       { metaReducers: [hydrationMetaReducer] }
     ),
-    provideEffects([GroceryEffects, CategoryEffects]),
+    provideEffects([GroceryEffects, CategoryEffects, AuthEffects, OrderEffects, PaymentEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
   ],
 });

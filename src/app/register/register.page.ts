@@ -1,12 +1,16 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonCheckbox } from '@ionic/angular/standalone';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { leaf, person, mail, lockClosed, shieldCheckmark, personAdd, mailOutline, lockClosedOutline, eyeOffOutline, personOutline, callOutline, eyeOutline } from 'ionicons/icons';
-import { ApiService } from '../services/api-service/api-service';
+import { Store } from '@ngrx/store';
 import { RegisterRequest } from '../models/user.model';
+import { AppState } from '../store';
+import { register } from '../store/actions/auth.actions';
+import { initialAuthState } from '../store/reducers/auth.reducer';
 
 @Component({
   selector: 'app-register',
@@ -17,15 +21,16 @@ import { RegisterRequest } from '../models/user.model';
 })
 export class RegisterPage implements OnInit {
   registerForm!: FormGroup;
-  isLoading = signal(false);
-  errorMessage = signal('');
+  private readonly authState = toSignal(this.store.select('auth'), { initialValue: initialAuthState });
+  private readonly validationError = signal('');
+  isLoading = computed(() => this.authState().loading);
+  errorMessage = computed(() => this.validationError() || this.authState().error || '');
   showPassword = signal(false);
   showConfirmPassword = signal(false);
 
   constructor(
     private formBuilder: FormBuilder,
-    private apiService: ApiService,
-    private router: Router
+    private store: Store<AppState>,
   ) {
     addIcons({personOutline,mailOutline,callOutline,lockClosedOutline,eyeOffOutline,eyeOutline,leaf,person,mail,lockClosed,shieldCheckmark,personAdd});
   }
@@ -48,10 +53,21 @@ export class RegisterPage implements OnInit {
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password')?.value;
     const confirmPassword = control.get('confirmPassword')?.value;
+    const confirmControl = control.get('confirmPassword');
 
-    if (password && confirmPassword && password !== confirmPassword) {
-      control.get('confirmPassword')?.setErrors({ 'passwordMismatch': true });
-      return { 'passwordMismatch': true };
+    if (!password || !confirmPassword || !confirmControl) {
+      return null;
+    }
+
+    const errors = confirmControl.errors || {};
+    if (password !== confirmPassword) {
+      confirmControl.setErrors({ ...errors, passwordMismatch: true });
+      return { passwordMismatch: true };
+    }
+
+    if (errors['passwordMismatch']) {
+      delete errors['passwordMismatch'];
+      confirmControl.setErrors(Object.keys(errors).length ? errors : null);
     }
     return null;
   }
@@ -66,12 +82,11 @@ export class RegisterPage implements OnInit {
 
   onSubmit() {
     if (this.registerForm.invalid) {
-      this.errorMessage.set('Please fill all fields correctly');
+      this.validationError.set('Please fill all fields correctly');
       return;
     }
 
-    this.isLoading.set(true);
-    this.errorMessage.set('');
+    this.validationError.set('');
 
     const registerData: RegisterRequest = {
       name: this.registerForm.get('name')?.value,
@@ -81,42 +96,7 @@ export class RegisterPage implements OnInit {
       confirmPassword: this.registerForm.get('confirmPassword')?.value
     };
 
-    this.apiService.postData('auth/register', registerData).subscribe({
-      next: (response) => {
-        if (response.success) {
-          // Check if email verification is required
-          // if (response.requiresVerification) {
-            // Store email temporarily for verification page
-            localStorage.setItem('pendingVerificationEmail', registerData.email);
-            
-            // Navigate to verify-email page with email and userId
-            this.router.navigate(['/verify-email'], {
-              state: {
-                email: registerData.email,
-                userId: response.user?.id
-              }
-            });
-          // } else {
-          //   // Direct login without verification
-          //   if (response.token) {
-          //     localStorage.setItem('authToken', response.token);
-          //   }
-          //   if (response.user) {
-          //     localStorage.setItem('user', JSON.stringify(response.user));
-          //   }
-          //   this.router.navigate(['/dashboard']);
-          // }
-        } else {
-          this.errorMessage.set(response.message || 'Registration failed');
-        }
-        this.isLoading.set(false);
-      },
-      error: (error) => {
-        this.errorMessage.set(error?.error?.message || 'An error occurred during registration');
-        console.error('Registration error:', error);
-        this.isLoading.set(false);
-      }
-    });
+    this.store.dispatch(register({ user: registerData }));
   }
 
   get name() {

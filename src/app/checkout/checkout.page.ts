@@ -3,16 +3,16 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonRadioGroup, IonRadio } from '@ionic/angular/standalone';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { location, card, cash, checkmarkCircle, arrowBack, documentText, phonePortrait, wallet } from 'ionicons/icons';
-import { firstValueFrom } from 'rxjs';
 import { Bucket } from '../models/bucket.model';
 import { Store } from '@ngrx/store';
 import { HeaderComponent } from '../components/header/header.component';
 import { ApiService } from '../services/api-service/api-service';
-import { PaymentService } from '../services/payment.service';
-import { clearBucket } from '../store/actions/bucket.action';
+import { AppState } from '../store';
+import { placeOrder } from '../store/actions/order.actions';
+import { initialOrderState } from '../store/reducers/order.reducer';
 
 interface SavedAddress {
   _id: string;
@@ -38,9 +38,11 @@ export class CheckoutPage implements OnInit {
   selectedAddressId = signal('');
   selectedPaymentMethod: 'card' | 'upi' | 'wallet' | 'cod' = 'card';
   deliveryInstructions: string = '';
-  isSubmitting = signal(false);
-  errorMessage = signal('');
-  successMessage = signal('');
+  private readonly orderState = toSignal(this.store.select('orders'), { initialValue: initialOrderState });
+  private readonly addressError = signal('');
+  isSubmitting = computed(() => this.orderState().placingOrder);
+  errorMessage = computed(() => this.orderState().error || this.addressError());
+  successMessage = computed(() => '');
   subtotal = computed(() =>
     this.bucketItems().reduce(
       (total, item) => total + (item.price?.finalAmount ?? item.price?.amount ?? 0) * item.quantity,
@@ -49,10 +51,8 @@ export class CheckoutPage implements OnInit {
   );
 
   constructor(
-    private store: Store<{ myBucket: Bucket[] }>,
-    private router: Router,
+    private store: Store<AppState>,
     private apiService: ApiService,
-    private paymentService: PaymentService,
   ) {
     this.bucketItems = toSignal(this.store.select('myBucket'), { initialValue: [] });
     addIcons({location,documentText,card,phonePortrait,cash,wallet,checkmarkCircle,arrowBack});
@@ -71,7 +71,7 @@ export class CheckoutPage implements OnInit {
           '',
         );
       },
-      error: (error) => this.errorMessage.set(this.messageFrom(error)),
+      error: (error) => this.addressError.set(this.messageFrom(error)),
     });
   }
 
@@ -79,75 +79,34 @@ export class CheckoutPage implements OnInit {
     return `${address.type} · ${address.street}, ${address.city}, ${address.state} ${address.zipCode}`;
   }
 
-  async placeOrder() {
+  placeOrder() {
     if (this.isSubmitting()) return;
-    this.errorMessage.set('');
+    this.addressError.set('');
 
     if (!this.bucketItems().length) {
-      this.errorMessage.set('Your cart is empty.');
+      this.addressError.set('Your cart is empty.');
       return;
     }
     if (!this.selectedAddressId()) {
-      this.errorMessage.set('Choose or add a delivery address to continue.');
+      this.addressError.set('Choose or add a delivery address to continue.');
       return;
     }
 
-    this.isSubmitting.set(true);
-    try {
-      const response = await firstValueFrom(
-        this.apiService.postData('orders', {
-          addressId: this.selectedAddressId(),
-          paymentMethod: this.selectedPaymentMethod,
-          notes: this.deliveryInstructions,
-          items: this.bucketItems().map((item) => ({
-            product: item._id ?? item.id,
-            quantity: item.quantity,
-          })),
-        }),
-      );
-      const order = response?.order ?? response;
-      const orderId = order?._id ?? order?.id;
-      if (!orderId) throw new Error('The server did not return an order.');
-
-      localStorage.setItem('selectedAddress', JSON.stringify(
-        this.addresses().find((address) => address._id === this.selectedAddressId()),
-      ));
-
-      if (this.selectedPaymentMethod === 'cod') {
-        this.completeOrder('Order placed. Payment is due on delivery.');
-        return;
-      }
-
-      const paymentOrder = await firstValueFrom(
-        this.paymentService.createRazorpayOrder(orderId),
-      );
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const payment = await this.paymentService.openCheckout({
-        key: paymentOrder.key,
-        amount: paymentOrder.amount,
-        currency: paymentOrder.currency,
-        name: 'Grocery Delivery',
-        description: 'Payment for your order',
-        order_id: paymentOrder.orderId,
-        prefill: { email: user.email, contact: user.phone },
-        theme: { color: '#16a34a' },
-      });
-      const verification = await firstValueFrom(
-        this.paymentService.verifyRazorpayPayment({ ...payment, orderId }),
-      );
-      if (!verification.success) throw new Error('Payment verification failed.');
-
-      this.completeOrder('Payment confirmed. Your order is placed.');
-    } catch (error) {
-      this.errorMessage.set(this.messageFrom(error));
-    } finally {
-      this.isSubmitting.set(false);
-    }
-  }
-
-  private completeOrder(message: string) {
-    this.store.dispatch(clearBucket());
-    this.successMessage.set(message);
+    this.addressError.set('');
+    localStorage.setItem('selectedAddress', JSON.stringify(
+      this.addresses().find((address) => address._id === this.selectedAddressId()),
+    ));
+    this.store.dispatch(placeOrder({
+      request: {
+        addressId: this.selectedAddressId(),
+        paymentMethod: this.selectedPaymentMethod,
+        notes: this.deliveryInstructions,
+        items: this.bucketItems().map((item) => ({
+          product: item._id ?? item.id,
+          quantity: item.quantity,
+        })),
+      },
+    }));
   }
 
   private getSavedAddressId(): string {

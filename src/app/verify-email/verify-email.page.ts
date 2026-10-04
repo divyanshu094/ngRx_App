@@ -1,11 +1,15 @@
-import { Component, OnInit, OnDestroy, signal, effect } from '@angular/core';
+import { Component, computed, effect, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonContent, IonButton, IonIcon, IonInput, IonText } from '@ionic/angular/standalone';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, mail, arrowBack } from 'ionicons/icons';
-import { ApiService } from '../services/api-service/api-service';
+import { Store } from '@ngrx/store';
+import { AppState } from '../store';
+import { resendOtp, verifyOtp } from '../store/actions/auth.actions';
+import { initialAuthState } from '../store/reducers/auth.reducer';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-verify-email',
@@ -16,10 +20,15 @@ import { ApiService } from '../services/api-service/api-service';
 })
 export class VerifyEmailPage implements OnInit, OnDestroy {
   verifyForm!: FormGroup;
-  isLoading = signal(false);
-  errorMessage = signal('');
-  successMessage = signal('');
-  isVerified = signal(false);
+  private readonly authState = toSignal(this.store.select('auth'), { initialValue: initialAuthState });
+  private readonly localError = signal('');
+  private readonly localMessage = signal('');
+  isLoading = computed(() => this.authState().loading);
+  errorMessage = computed(() => this.localError() || this.authState().error || '');
+  successMessage = computed(() => this.authState().emailVerified ? 'Email verified successfully!' : this.localMessage());
+  isVerified = computed(() => this.authState().emailVerified);
+  private readonly routeVerificationCode = signal('');
+  verificationCode = computed(() => this.authState().debugVerificationCode || this.routeVerificationCode());
   
   // OTP timer
   timeLeft = signal(300); // 5 minutes
@@ -27,15 +36,21 @@ export class VerifyEmailPage implements OnInit, OnDestroy {
   canResend = signal(false);
   
   email = signal('');
-  userId = signal('');
-
   constructor(
     private formBuilder: FormBuilder,
-    private apiService: ApiService,
     private router: Router,
-    private route: ActivatedRoute
+    private store: Store<AppState>,
   ) {
     addIcons({ checkmarkCircle, mail, arrowBack });
+    effect(() => {
+      if (this.authState().emailVerified) {
+        this.timerActive.set(false);
+        setTimeout(() => {
+          localStorage.removeItem('pendingVerificationEmail');
+          this.router.navigate(['/login']);
+        }, 2000);
+      }
+    });
   }
 
   ngOnInit() {
@@ -59,7 +74,7 @@ export class VerifyEmailPage implements OnInit, OnDestroy {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state?.['email']) {
       this.email.set(navigation.extras.state['email']);
-      this.userId.set(navigation.extras.state['userId']);
+      this.routeVerificationCode.set(navigation.extras.state['verificationCode'] || '');
     } else {
       // Fallback: try to get from route params or local storage
       const storedEmail = localStorage.getItem('pendingVerificationEmail');
@@ -95,83 +110,26 @@ export class VerifyEmailPage implements OnInit, OnDestroy {
 
   onSubmit() {
     if (this.verifyForm.invalid) {
-      this.errorMessage.set('Please enter a valid 6-digit OTP');
+      this.localError.set('Please enter a valid 6-digit OTP');
       return;
     }
 
-    this.isLoading.set(true);
-    this.errorMessage.set('');
-    this.successMessage.set('');
+    this.localError.set('');
+    this.localMessage.set('');
 
     const otp = this.verifyForm.get('otp')?.value;
-    const verifyData = {
-      email: this.email(),
-      otp: otp,
-      userId: this.userId()
-    };
-
-    this.apiService.postData('auth/verify-otp', verifyData).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.successMessage.set('Email verified successfully!');
-          this.isVerified.set(true);
-          this.timerActive.set(false);
-
-          // Store the token if provided
-          if (response.token) {
-            localStorage.setItem('authToken', response.token);
-          }
-          if (response.user) {
-            localStorage.setItem('user', JSON.stringify(response.user));
-          }
-
-          // Navigate to dashboard after 2 seconds
-          setTimeout(() => {
-            localStorage.removeItem('pendingVerificationEmail');
-            this.router.navigate(['/login']);
-          }, 2000);
-        } else {
-          this.errorMessage.set(response.message || 'Email verification failed');
-        }
-        this.isLoading.set(false);
-      },
-      error: (error) => {
-        this.errorMessage.set(error?.error?.message || 'An error occurred during verification');
-        console.error('Verification error:', error);
-        this.isLoading.set(false);
-      }
-    });
+    this.store.dispatch(verifyOtp({ email: this.email(), otp }));
   }
 
   onResendOTP() {
-    this.isLoading.set(true);
-    this.errorMessage.set('');
-
-    const resendData = {
-      email: this.email(),
-      userId: this.userId()
-    };
-
-    this.apiService.postData('auth/send-otp', resendData).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.successMessage.set('OTP sent successfully!');
-          this.timeLeft.set(300); // Reset timer to 5 minutes
-          this.timerActive.set(true);
-          this.canResend.set(false);
-          this.verifyForm.reset();
-          this.startTimer();
-        } else {
-          this.errorMessage.set(response.message || 'Failed to resend OTP');
-        }
-        this.isLoading.set(false);
-      },
-      error: (error) => {
-        this.errorMessage.set(error?.error?.message || 'An error occurred while resending OTP');
-        console.error('Resend OTP error:', error);
-        this.isLoading.set(false);
-      }
-    });
+    this.localError.set('');
+    this.localMessage.set('');
+    this.timeLeft.set(300);
+    this.timerActive.set(true);
+    this.canResend.set(false);
+    this.verifyForm.reset();
+    this.startTimer();
+    this.store.dispatch(resendOtp({ email: this.email() }));
   }
 
   goBack() {

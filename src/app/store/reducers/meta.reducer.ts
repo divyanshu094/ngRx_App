@@ -13,14 +13,26 @@ export const hydrationMetaReducer: MetaReducer<any> =
       const storageValue = localStorage.getItem('app_state');
       if ((action.type === INIT || action.type === UPDATE) && storageValue) {
         try {
-          return JSON.parse(storageValue);
+          const persistedState = JSON.parse(storageValue);
+          return { ...reducer(undefined, action), ...persistedState };
         } catch {
           localStorage.removeItem('app_state');
         }
       }
 
       const nextState = reducer(state, action);
-      localStorage.setItem('app_state', JSON.stringify(nextState));
+      const persistedState = nextState?.auth
+        ? {
+            ...nextState,
+            auth: {
+              ...nextState.auth,
+              debugVerificationCode: null,
+              loading: false,
+              error: null,
+            },
+          }
+        : nextState;
+      localStorage.setItem('app_state', JSON.stringify(persistedState));
       return nextState;
     };
   };

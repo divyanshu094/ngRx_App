@@ -1,12 +1,16 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonContent, IonItem, IonButton, IonLabel, IonInput, IonIcon, IonCheckbox } from '@ionic/angular/standalone';
-import { ActivatedRoute, RouterLink, Router } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { leaf, mail, lockClosed, logIn, mailOutline, lockClosedOutline, eyeOffOutline, eyeOutline } from 'ionicons/icons';
-import { ApiService } from '../services/api-service/api-service';
+import { Store } from '@ngrx/store';
 import { LoginRequest } from '../models/user.model';
+import { AppState } from '../store';
+import { login } from '../store/actions/auth.actions';
+import { initialAuthState } from '../store/reducers/auth.reducer';
 
 @Component({
   selector: 'app-login',
@@ -17,14 +21,15 @@ import { LoginRequest } from '../models/user.model';
 })
 export class LoginPage implements OnInit {
   loginForm!: FormGroup;
-  isLoading = signal(false);
-  errorMessage = signal('');
+  private readonly authState = toSignal(this.store.select('auth'), { initialValue: initialAuthState });
+  private readonly validationError = signal('');
+  isLoading = computed(() => this.authState().loading);
+  errorMessage = computed(() => this.validationError() || this.authState().error || '');
   showPassword = signal(false);
 
   constructor(
     private formBuilder: FormBuilder,
-    private apiService: ApiService,
-    private router: Router,
+    private store: Store<AppState>,
     private route: ActivatedRoute,
   ) {
     addIcons({mailOutline,lockClosedOutline,eyeOffOutline,eyeOutline,leaf,mail,lockClosed,logIn});
@@ -48,44 +53,21 @@ export class LoginPage implements OnInit {
 
   onSubmit() {
     if (this.loginForm.invalid) {
-      this.errorMessage.set('Please fill all fields correctly');
+      this.validationError.set('Please fill all fields correctly');
       return;
     }
 
-    this.isLoading.set(true);
-    this.errorMessage.set('');
+    this.validationError.set('');
 
     const loginData: LoginRequest = {
       email: this.loginForm.get('email')?.value,
       password: this.loginForm.get('password')?.value
     };
 
-    this.apiService.postData("auth/login",loginData).subscribe({
-      next: (response) => {
-        if (response?.success && response.token) {
-          localStorage.setItem('authToken', response.token);
-          if (response.refreshToken) {
-            localStorage.setItem('refreshToken', response.refreshToken);
-          }
-          if (response.user) {
-            localStorage.setItem('user', JSON.stringify(response.user));
-          }
-          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-          const destination = returnUrl?.startsWith('/') && !returnUrl.startsWith('//')
-            ? returnUrl
-            : '/dashboard';
-          this.router.navigateByUrl(destination, { replaceUrl: true });
-        } else {
-          this.errorMessage.set(response.message || 'Login failed');
-        }
-        this.isLoading.set(false);
-      },
-      error: (error) => {
-        this.errorMessage.set(error?.error?.message || 'An error occurred during login');
-        console.error('Login error:', error);
-        this.isLoading.set(false);
-      }
-    });
+    this.store.dispatch(login({
+      credentials: loginData,
+      returnUrl: this.route.snapshot.queryParamMap.get('returnUrl'),
+    }));
   }
 
   get email() {
