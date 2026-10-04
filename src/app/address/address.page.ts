@@ -48,6 +48,7 @@ import { addIcons } from 'ionicons';
 import { GoogleMap } from '@capacitor/google-maps';
 import { Geolocation } from '@capacitor/geolocation';
 import { ApiService } from '../services/api-service/api-service';
+import { MOBILE_API_ENDPOINTS, MOBILE_APP_TEXT, MOBILE_STORAGE_KEYS } from '../constants/app.constants';
 declare var google: any;
 import * as L from 'leaflet';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
@@ -110,6 +111,7 @@ export interface Coordinates {
   ],
 })
 export class AddressPage implements OnInit, AfterViewInit {
+  readonly text = MOBILE_APP_TEXT;
   @ViewChild('map', { static: false }) mapRef!: ElementRef;
   @ViewChild('searchInput', { static: false })
   searchInput!: ElementRef;
@@ -164,7 +166,7 @@ export class AddressPage implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.apiService.getData('addresses').subscribe({
+    this.apiService.getData(MOBILE_API_ENDPOINTS.addresses.list).subscribe({
       next: (result) => {
         this.savedAddresses.set(result.addresses);
       },
@@ -366,7 +368,7 @@ export class AddressPage implements OnInit, AfterViewInit {
       isDefault: true,
     };
 
-    this.apiService.postData('addresses', address).subscribe({
+    this.apiService.postData(MOBILE_API_ENDPOINTS.addresses.list, address).subscribe({
       next: (response) => {
         this.savedAddresses.update((addresses) => [response.address, ...addresses]);
         this.selectAddress(response.address);
@@ -423,7 +425,7 @@ export class AddressPage implements OnInit, AfterViewInit {
 
   selectAddress(address: any) {
     this.selectedAddressId = address._id;
-    localStorage.setItem('selectedAddress', JSON.stringify(address));
+    localStorage.setItem(MOBILE_STORAGE_KEYS.selectedAddress, JSON.stringify(address));
     const returnTo = this.route.snapshot.queryParamMap.get('returnTo');
     this.router.navigateByUrl(returnTo === 'checkout' ? '/checkout' : '/dashboard');
   }
@@ -453,7 +455,7 @@ export class AddressPage implements OnInit, AfterViewInit {
   }
 
   deleteAddress(address: Address) {
-    this.apiService.deleteData(`addresses/${address._id}`, {}).subscribe({
+    this.apiService.deleteData(MOBILE_API_ENDPOINTS.addresses.byId(address._id), {}).subscribe({
       next: (response) => {
         this.savedAddresses.update((addresses) =>
           addresses.filter((addr) => addr._id !== address._id),
@@ -474,7 +476,7 @@ export class AddressPage implements OnInit, AfterViewInit {
     let addresJson = { ...this.newAddress };
     delete addresJson._id;
     this.apiService
-      .updateData(`addresses/${this.newAddress._id}`, addresJson)
+      .updateData(MOBILE_API_ENDPOINTS.addresses.update(this.newAddress._id), addresJson)
       .subscribe({
         next: (response) => {
           this.savedAddresses.update((addresses) =>

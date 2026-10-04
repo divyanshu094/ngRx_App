@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { ApiService } from '../../services/api-service/api-service';
 import { PaymentService } from '../../services/payment.service';
 import { CustomerOrder, PlaceOrderRequest } from '../../models/order.model';
+import { MOBILE_API_ENDPOINTS, MOBILE_APP_TEXT, MOBILE_CONFIG, MOBILE_ROUTES, MOBILE_STORAGE_KEYS } from '../../constants/app.constants';
 import { clearBucket } from '../actions/bucket.action';
 import * as OrderActions from '../actions/order.actions';
 
@@ -19,7 +20,7 @@ export class OrderEffects {
 
   loadOrders$ = createEffect(() => this.actions$.pipe(
     ofType(OrderActions.loadOrders),
-    exhaustMap(() => this.api.getData('orders').pipe(
+    exhaustMap(() => this.api.getData(MOBILE_API_ENDPOINTS.orders.list).pipe(
       map((response: any) => OrderActions.loadOrdersSuccess({ orders: response?.orders ?? [] })),
       catchError((error) => of(OrderActions.loadOrdersFailure({ error: this.messageFrom(error) }))),
     )),
@@ -31,7 +32,7 @@ export class OrderEffects {
       map(({ order }) => OrderActions.placeOrderSuccess({ order })),
       catchError((error) => of(OrderActions.placeOrderFailure({
         error: error?.order
-          ? `${this.messageFrom(error)} Your order is saved and can be paid from order history.`
+          ? `${this.messageFrom(error)} ${MOBILE_APP_TEXT.errors.orderSavedCanPay}`
           : this.messageFrom(error),
         order: error?.order,
       }))),
@@ -51,7 +52,7 @@ export class OrderEffects {
   navigateAfterCheckout$ = createEffect(() => this.actions$.pipe(
     ofType(OrderActions.placeOrderSuccess),
     tap(() => {
-      void this.router.navigateByUrl('/order-history');
+      void this.router.navigateByUrl(MOBILE_ROUTES.orderHistory);
     }),
   ), { dispatch: false });
 
@@ -70,7 +71,7 @@ export class OrderEffects {
 
   cancelOrder$ = createEffect(() => this.actions$.pipe(
     ofType(OrderActions.cancelOrder),
-    exhaustMap(({ orderId }) => this.api.updateData(`orders/${orderId}/cancel`, {}).pipe(
+    exhaustMap(({ orderId }) => this.api.updateData(MOBILE_API_ENDPOINTS.orders.cancel(orderId), {}).pipe(
       map((response: any) => OrderActions.cancelOrderSuccess({ order: response.order })),
       catchError((error) => of(OrderActions.cancelOrderFailure({ error: this.messageFrom(error) }))),
     )),
@@ -78,8 +79,8 @@ export class OrderEffects {
 
   trackOrder$ = createEffect(() => this.actions$.pipe(
     ofType(OrderActions.trackOrder),
-    switchMap(({ orderId }) => timer(0, 15000).pipe(
-      exhaustMap(() => this.api.getData(`orders/${orderId}/track`)),
+    switchMap(({ orderId }) => timer(0, MOBILE_CONFIG.orderTrackingIntervalMs).pipe(
+      exhaustMap(() => this.api.getData(MOBILE_API_ENDPOINTS.orders.track(orderId))),
       takeWhile((tracking: any) => !['delivered', 'cancelled', 'refunded'].includes(tracking?.status), true),
       map((tracking) => OrderActions.trackOrderUpdate({ tracking })),
       takeUntil(this.actions$.pipe(ofType(OrderActions.stopTrackingOrder, OrderActions.trackOrder))),
@@ -90,8 +91,8 @@ export class OrderEffects {
   loadDeliveryQueue$ = createEffect(() => this.actions$.pipe(
     ofType(OrderActions.loadDeliveryQueue),
     exhaustMap(() => forkJoin({
-      available: this.api.getData('delivery/orders?status=available'),
-      assigned: this.api.getData('delivery/orders?status=assigned'),
+      available: this.api.getData(MOBILE_API_ENDPOINTS.delivery.orders('available')),
+      assigned: this.api.getData(MOBILE_API_ENDPOINTS.delivery.orders('assigned')),
     }).pipe(
       map(({ available, assigned }) => OrderActions.loadDeliveryQueueSuccess({
         available: available?.orders ?? [],
@@ -103,7 +104,7 @@ export class OrderEffects {
 
   updateDeliveryOrder$ = createEffect(() => this.actions$.pipe(
     ofType(OrderActions.updateDeliveryOrder),
-    exhaustMap(({ orderId, action }) => this.api.updateData(`delivery/orders/${orderId}/${action}`, {}).pipe(
+    exhaustMap(({ orderId, action }) => this.api.updateData(MOBILE_API_ENDPOINTS.delivery.updateOrder(orderId, action), {}).pipe(
       map(() => OrderActions.updateDeliveryOrderSuccess()),
       catchError((error) => of(OrderActions.updateDeliveryOrderFailure({ error: this.messageFrom(error) }))),
     )),
@@ -116,16 +117,16 @@ export class OrderEffects {
 
   updateAgentLocation$ = createEffect(() => this.actions$.pipe(
     ofType(OrderActions.updateAgentLocation),
-    exhaustMap(({ latitude, longitude }) => this.api.updateData('delivery/location', { latitude, longitude }).pipe(
+    exhaustMap(({ latitude, longitude }) => this.api.updateData(MOBILE_API_ENDPOINTS.delivery.location, { latitude, longitude }).pipe(
       map(() => OrderActions.loadDeliveryQueue()),
       catchError((error) => of(OrderActions.updateAgentLocationFailure({ error: this.messageFrom(error) }))),
     )),
   ));
 
   private async finishCheckout(request: PlaceOrderRequest): Promise<{ order: CustomerOrder }> {
-    const response = await firstValueFrom(this.api.postData('orders', request));
+    const response = await firstValueFrom(this.api.postData(MOBILE_API_ENDPOINTS.orders.create, request));
     const order = (response?.order ?? response) as CustomerOrder;
-    if (!order?._id) throw new Error('The server did not return an order.');
+    if (!order?._id) throw new Error(MOBILE_APP_TEXT.errors.orderMissing);
     if (request.paymentMethod === 'cod') return { order };
 
     try {
@@ -143,7 +144,7 @@ export class OrderEffects {
 
   private async completePayment(orderId: string): Promise<void> {
     const paymentOrder = await firstValueFrom(this.payment.createRazorpayOrder(orderId));
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const user = JSON.parse(localStorage.getItem(MOBILE_STORAGE_KEYS.user) || '{}');
     const payment = await this.payment.openCheckout({
       key: paymentOrder.key,
       amount: paymentOrder.amount,
@@ -155,10 +156,10 @@ export class OrderEffects {
       theme: { color: '#16a34a' },
     });
     const verification = await firstValueFrom(this.payment.verifyRazorpayPayment({ ...payment, orderId }));
-    if (!verification.success) throw new Error('Payment verification failed.');
+    if (!verification.success) throw new Error(MOBILE_APP_TEXT.errors.paymentVerificationFailed);
   }
 
   private messageFrom(error: any): string {
-    return error?.error?.message || error?.message || 'Unable to complete the request.';
+    return error?.error?.message || error?.message || MOBILE_APP_TEXT.errors.unableRequest;
   }
 }

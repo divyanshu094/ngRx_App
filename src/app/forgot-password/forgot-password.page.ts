@@ -10,6 +10,7 @@ import { arrowBack, keyOutline, mailOutline } from 'ionicons/icons';
 import { AppState } from '../store';
 import { requestPasswordReset, resetPassword } from '../store/actions/auth.actions';
 import { initialAuthState } from '../store/reducers/auth.reducer';
+import { MOBILE_APP_TEXT, MOBILE_CONFIG } from '../constants/app.constants';
 
 @Component({
   selector: 'app-forgot-password',
@@ -19,6 +20,8 @@ import { initialAuthState } from '../store/reducers/auth.reducer';
   styleUrls: ['./forgot-password.page.scss'],
 })
 export class ForgotPasswordPage {
+  readonly text = MOBILE_APP_TEXT;
+  readonly minimumPasswordLength = MOBILE_CONFIG.minimumPasswordLength;
   private readonly authState = toSignal(this.store.select('auth'), { initialValue: initialAuthState });
   token = signal(this.route.snapshot.queryParamMap.get('token') || '');
   email = '';
@@ -41,7 +44,7 @@ export class ForgotPasswordPage {
   sendResetLink() {
     this.localError.set('');
     if (!this.email.trim()) {
-      this.localError.set('Enter the email address on your account.');
+      this.localError.set(this.text.recovery.emailRequired);
       return;
     }
     this.store.dispatch(requestPasswordReset({ email: this.email.trim().toLowerCase() }));
@@ -49,12 +52,12 @@ export class ForgotPasswordPage {
 
   updatePassword() {
     this.localError.set('');
-    if (this.password.length < 8) {
-      this.localError.set('Use at least 8 characters for your new password.');
+    if (this.password.length < this.minimumPasswordLength) {
+      this.localError.set(this.text.recovery.passwordMinimum.replace('{{length}}', this.minimumPasswordLength.toString()));
       return;
     }
     if (this.password !== this.confirmPassword) {
-      this.localError.set('The passwords do not match.');
+      this.localError.set(this.text.recovery.passwordsMismatch);
       return;
     }
     this.store.dispatch(resetPassword({ token: this.token(), password: this.password }));

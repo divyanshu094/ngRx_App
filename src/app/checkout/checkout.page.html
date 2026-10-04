@@ -1,4 +1,4 @@
-<app-header title="Checkout" [showBackButton]="true"></app-header>
+<app-header [title]="text.checkout.title" [showBackButton]="true"></app-header>
 
 <ion-content fullscreen="false" class="bg-slate-50">
   <div class="mx-auto max-w-4xl px-4 py-6">
@@ -9,22 +9,22 @@
     @if (successMessage()) {
       <div class="rounded-xl border border-emerald-200 bg-white p-6 text-center shadow-sm">
         <ion-icon name="checkmark-circle" class="text-4xl text-emerald-600"></ion-icon>
-        <h2 class="mt-3 text-lg font-semibold text-slate-900">Order confirmed</h2>
+        <h2 class="mt-3 text-lg font-semibold text-slate-900">{{ text.checkout.confirmed }}</h2>
         <p class="mt-1 text-sm text-slate-600">{{ successMessage() }}</p>
-        <ion-button class="mt-5" routerLink="/dashboard">Continue shopping</ion-button>
+        <ion-button class="mt-5" routerLink="/dashboard">{{ text.checkout.continueShopping }}</ion-button>
       </div>
     } @else if (!bucketItems().length) {
       <div class="rounded-xl border border-slate-200 bg-white p-6 text-center text-slate-600">
-        Your cart is empty.
-        <ion-button class="mt-4" routerLink="/dashboard">Browse products</ion-button>
+        {{ text.checkout.empty }}
+        <ion-button class="mt-4" routerLink="/dashboard">{{ text.checkout.browseProducts }}</ion-button>
       </div>
     } @else {
       <div class="grid gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
           <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="mb-4 flex items-center justify-between gap-3">
-              <h2 class="text-lg font-semibold text-slate-900">Delivery address</h2>
-              <ion-button fill="clear" size="small" [routerLink]="['/address']" [queryParams]="{ returnTo: 'checkout' }">Manage</ion-button>
+              <h2 class="text-lg font-semibold text-slate-900">{{ text.checkout.deliveryAddress }}</h2>
+              <ion-button fill="clear" size="small" [routerLink]="['/address']" [queryParams]="{ returnTo: 'checkout' }">{{ text.checkout.manage }}</ion-button>
             </div>
 
             @if (addresses().length) {
@@ -40,66 +40,66 @@
                 }
               </ion-radio-group>
             } @else {
-              <p class="text-sm text-slate-600">Add a saved address before placing your order.</p>
-              <ion-button class="mt-3" [routerLink]="['/address']" [queryParams]="{ returnTo: 'checkout' }">Add address</ion-button>
+              <p class="text-sm text-slate-600">{{ text.checkout.addSavedAddress }}</p>
+              <ion-button class="mt-3" [routerLink]="['/address']" [queryParams]="{ returnTo: 'checkout' }">{{ text.checkout.addAddress }}</ion-button>
             }
 
             <ion-item class="mt-3 rounded-lg border border-slate-200 bg-slate-50" lines="none">
               <ion-icon name="document-text" slot="start" class="text-slate-400"></ion-icon>
-              <ion-label position="floating">Delivery instructions (optional)</ion-label>
-              <ion-input [(ngModel)]="deliveryInstructions" placeholder="Gate code, drop-off details"></ion-input>
+              <ion-label position="floating">{{ text.checkout.instructions }}</ion-label>
+              <ion-input [(ngModel)]="deliveryInstructions" [placeholder]="text.checkout.instructionsPlaceholder"></ion-input>
             </ion-item>
           </section>
 
           <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="mb-4 text-lg font-semibold text-slate-900">Payment method</h2>
+            <h2 class="mb-4 text-lg font-semibold text-slate-900">{{ text.checkout.paymentMethod }}</h2>
             <ion-radio-group [(ngModel)]="selectedPaymentMethod">
               <ion-item lines="none" class="mb-2 rounded-lg border border-slate-200 bg-slate-50">
                 <ion-radio slot="start" value="card"></ion-radio>
                 <ion-icon name="card" slot="start" class="mr-3 text-slate-500"></ion-icon>
-                <ion-label>Credit or debit card</ion-label>
+                <ion-label>{{ text.checkout.card }}</ion-label>
               </ion-item>
               <ion-item lines="none" class="mb-2 rounded-lg border border-slate-200 bg-slate-50">
                 <ion-radio slot="start" value="upi"></ion-radio>
                 <ion-icon name="phone-portrait" slot="start" class="mr-3 text-slate-500"></ion-icon>
-                <ion-label>UPI</ion-label>
+                <ion-label>{{ text.checkout.upi }}</ion-label>
               </ion-item>
               <ion-item lines="none" class="mb-2 rounded-lg border border-slate-200 bg-slate-50">
                 <ion-radio slot="start" value="wallet"></ion-radio>
                 <ion-icon name="wallet" slot="start" class="mr-3 text-slate-500"></ion-icon>
-                <ion-label>Wallet or net banking</ion-label>
+                <ion-label>{{ text.checkout.wallet }}</ion-label>
               </ion-item>
               <ion-item lines="none" class="rounded-lg border border-slate-200 bg-slate-50">
                 <ion-radio slot="start" value="cod"></ion-radio>
                 <ion-icon name="cash" slot="start" class="mr-3 text-slate-500"></ion-icon>
-                <ion-label>Cash on delivery</ion-label>
+                <ion-label>{{ text.checkout.cod }}</ion-label>
               </ion-item>
             </ion-radio-group>
           </section>
         </div>
 
         <aside class="h-fit rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 class="mb-4 text-lg font-semibold text-slate-900">Order summary</h2>
+          <h2 class="mb-4 text-lg font-semibold text-slate-900">{{ text.checkout.summary }}</h2>
           <div class="mb-4 max-h-64 space-y-3 overflow-y-auto">
             @for (item of bucketItems(); track item._id || item.id) {
               <div class="flex items-center gap-3">
                 <img [src]="item.image || './assets/icon/favicon.png'" [alt]="item.name" class="h-12 w-12 rounded-lg object-cover" />
                 <div class="min-w-0 flex-1">
                   <p class="truncate text-sm font-medium text-slate-900">{{ item.name }}</p>
-                  <p class="text-xs text-slate-500">Qty: {{ item.quantity }}</p>
+                  <p class="text-xs text-slate-500">{{ text.checkout.quantity.replace('{{count}}', item.quantity.toString()) }}</p>
                 </div>
                 <span class="text-sm font-medium text-slate-800">{{ (item.price.finalAmount * item.quantity) | currency:'INR':'symbol' }}</span>
               </div>
             }
           </div>
           <div class="space-y-2 border-t border-slate-200 pt-4 text-sm">
-            <div class="flex justify-between"><span>Subtotal</span><span>{{ subtotal() | currency:'INR':'symbol' }}</span></div>
-            <div class="flex justify-between"><span>Delivery</span><span>Free</span></div>
-            <div class="flex justify-between border-t border-slate-200 pt-3 text-base font-semibold"><span>Total</span><span>{{ subtotal() | currency:'INR':'symbol' }}</span></div>
+            <div class="flex justify-between"><span>{{ text.checkout.subtotal }}</span><span>{{ subtotal() | currency:'INR':'symbol' }}</span></div>
+            <div class="flex justify-between"><span>{{ text.checkout.delivery }}</span><span>{{ text.checkout.free }}</span></div>
+            <div class="flex justify-between border-t border-slate-200 pt-3 text-base font-semibold"><span>{{ text.checkout.total }}</span><span>{{ subtotal() | currency:'INR':'symbol' }}</span></div>
           </div>
           <ion-button expand="block" class="mt-5" [disabled]="isSubmitting() || !selectedAddressId()" (click)="placeOrder()">
             <ion-icon name="checkmark-circle" slot="start"></ion-icon>
-            {{ isSubmitting() ? 'Processing…' : 'Place order' }}
+            {{ isSubmitting() ? text.checkout.processing : text.checkout.placeOrder }}
           </ion-button>
         </aside>
       </div>

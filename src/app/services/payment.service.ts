@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { Checkout } from 'capacitor-razorpay';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { MOBILE_API_ENDPOINTS, MOBILE_APP_TEXT } from '../constants/app.constants';
 
 export interface RazorpayOrder {
   success: boolean;
@@ -38,7 +39,7 @@ export class PaymentService {
 
   createRazorpayOrder(orderId: string): Observable<RazorpayOrder> {
     return this.http.post<RazorpayOrder>(
-      `${environment.apiUrl}payments/razorpay/create-order`,
+      `${environment.apiUrl}${MOBILE_API_ENDPOINTS.payments.createOrder}`,
       { orderId },
     );
   }
@@ -47,7 +48,7 @@ export class PaymentService {
     payment: RazorpayPaymentResponse & { orderId: string },
   ): Observable<{ success: boolean; message: string }> {
     return this.http.post<{ success: boolean; message: string }>(
-      `${environment.apiUrl}payments/razorpay/verify`,
+      `${environment.apiUrl}${MOBILE_API_ENDPOINTS.payments.verifyOrder}`,
       payment,
     );
   }
@@ -59,7 +60,7 @@ export class PaymentService {
 
     return new Promise((resolve, reject) => {
       if (!window.Razorpay) {
-        reject(new Error('Payment checkout could not be loaded. Check your internet connection.'));
+        reject(new Error(MOBILE_APP_TEXT.errors.paymentLoadFailed));
         return;
       }
 
@@ -76,12 +77,12 @@ export class PaymentService {
           finish(() => resolve(response));
         },
         modal: {
-          ondismiss: () => finish(() => reject(new Error('Payment cancelled.'))),
+          ondismiss: () => finish(() => reject(new Error(MOBILE_APP_TEXT.errors.paymentCancelled))),
         },
       });
 
       checkout.on?.('payment.failed', (response) => {
-        const message = response?.error?.description || 'Payment failed.';
+        const message = response?.error?.description || MOBILE_APP_TEXT.errors.paymentFailed;
         finish(() => reject(new Error(message)));
       });
 
@@ -102,7 +103,7 @@ export class PaymentService {
         : result.response;
       return response as RazorpayPaymentResponse;
     } catch (error: any) {
-      let message = error?.message || 'Payment failed.';
+      let message = error?.message || MOBILE_APP_TEXT.errors.paymentFailed;
       try {
         message = JSON.parse(message).description || message;
       } catch {

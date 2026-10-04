@@ -11,6 +11,7 @@ import { LoginRequest } from '../models/user.model';
 import { AppState } from '../store';
 import { login } from '../store/actions/auth.actions';
 import { initialAuthState } from '../store/reducers/auth.reducer';
+import { MOBILE_APP_TEXT } from '../constants/app.constants';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,7 @@ import { initialAuthState } from '../store/reducers/auth.reducer';
   imports: [IonButton, IonItem, IonContent, IonLabel, IonInput, IonIcon, IonCheckbox, CommonModule, FormsModule, ReactiveFormsModule, RouterLink]
 })
 export class LoginPage implements OnInit {
+  readonly text = MOBILE_APP_TEXT;
   loginForm!: FormGroup;
   private readonly authState = toSignal(this.store.select('auth'), { initialValue: initialAuthState });
   private readonly validationError = signal('');
@@ -53,7 +55,7 @@ export class LoginPage implements OnInit {
 
   onSubmit() {
     if (this.loginForm.invalid) {
-      this.validationError.set('Please fill all fields correctly');
+      this.validationError.set(this.text.login.requiredFields);
       return;
     }
 

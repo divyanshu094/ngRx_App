@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { Geolocation } from '@capacitor/geolocation';
 import { Store } from '@ngrx/store';
+import { MOBILE_APP_TEXT } from '../constants/app.constants';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { addIcons } from 'ionicons';
 import { locateOutline, logOutOutline, refreshOutline } from 'ionicons/icons';
@@ -19,6 +20,7 @@ import { DeliveryOrder, OrderItem } from '../models/order.model';
   templateUrl: './delivery.page.html',
 })
 export class DeliveryPage implements OnInit {
+  readonly text = MOBILE_APP_TEXT;
   private readonly orderState = toSignal(this.store.select('orders'), { initialValue: initialOrderState });
   availableOrders = computed(() => this.orderState().availableDeliveryOrders);
   assignedOrders = computed(() => this.orderState().assignedDeliveryOrders);
@@ -60,16 +62,16 @@ export class DeliveryPage implements OnInit {
         longitude: position.coords.longitude,
       }));
     } catch {
-      this.locationError.set('Location is unavailable. Check this device’s location permission.');
+      this.locationError.set(this.text.errors.locationUnavailable);
     }
   }
 
   customerName(order: DeliveryOrder): string {
-    return order.user?.name || 'Customer';
+    return order.user?.name || this.text.errors.customerFallback;
   }
 
   productName(item: OrderItem): string {
-    return typeof item.product === 'string' ? 'Product' : item.product?.name || 'Product';
+    return typeof item.product === 'string' ? this.text.errors.productFallback : item.product?.name || this.text.errors.productFallback;
   }
 
   nextAction(order: DeliveryOrder): 'picked' | 'delivered' | null {

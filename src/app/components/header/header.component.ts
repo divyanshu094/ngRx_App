@@ -5,6 +5,7 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton, IonList, Io
 import { Store } from '@ngrx/store';
 import { map, Observable } from 'rxjs';
 import { Bucket } from 'src/app/models/bucket.model';
+import { MOBILE_APP_TEXT } from '../../constants/app.constants';
 
 
 @Component({
@@ -15,7 +16,8 @@ import { Bucket } from 'src/app/models/bucket.model';
   imports: [IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonIcon, IonBadge, CommonModule, RouterLink]
 })
 export class HeaderComponent implements OnInit {
-  @Input() title: string = 'Default Title';
+  readonly text = MOBILE_APP_TEXT;
+  @Input() title: string = MOBILE_APP_TEXT.name;
   @Input() showBackButton: boolean = false;
   bucket$?: Observable<Bucket[]>;
   totalQuantity$: Observable<number> | undefined;

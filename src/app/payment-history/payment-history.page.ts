@@ -9,6 +9,7 @@ import { AppState } from '../store';
 import { loadPaymentHistory } from '../store/actions/payment.actions';
 import { initialPaymentState } from '../store/reducers/payment.reducer';
 import { PaymentTransaction } from '../models/payment-transaction.model';
+import { MOBILE_APP_TEXT, MOBILE_CONFIG } from '../constants/app.constants';
 
 @Component({
   selector: 'app-payment-history',
@@ -17,6 +18,7 @@ import { PaymentTransaction } from '../models/payment-transaction.model';
   templateUrl: './payment-history.page.html',
 })
 export class PaymentHistoryPage implements OnInit {
+  readonly text = MOBILE_APP_TEXT;
   private readonly paymentState = toSignal(this.store.select('payments'), { initialValue: initialPaymentState });
   transactions = computed(() => this.paymentState().transactions);
   total = computed(() => this.paymentState().total);
@@ -37,10 +39,10 @@ export class PaymentHistoryPage implements OnInit {
 
   orderNumber(transaction: PaymentTransaction): string {
     if (typeof transaction.order === 'string') return transaction.order;
-    return transaction.order?.tracking?.trackingNumber || transaction.order?._id || 'Order';
+    return transaction.order?.tracking?.trackingNumber || transaction.order?._id || this.text.errors.orderFallback;
   }
 
   amountMajor(transaction: PaymentTransaction): number {
-    return transaction.amountMinor / 100;
+    return transaction.amountMinor / MOBILE_CONFIG.minorCurrencyUnitsPerMajor;
   }
 }

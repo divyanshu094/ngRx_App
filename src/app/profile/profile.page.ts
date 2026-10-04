@@ -18,6 +18,7 @@ import {
   IonChip,
 } from '@ionic/angular/standalone';
 import { RouterLink } from '@angular/router';
+import { MOBILE_APP_TEXT, MOBILE_STORAGE_KEYS } from '../constants/app.constants';
 import { Store } from '@ngrx/store';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AppState } from '../store';
@@ -60,6 +61,7 @@ import {
   ],
 })
 export class ProfilePage implements OnInit {
+  readonly text = MOBILE_APP_TEXT;
   private readonly authState = toSignal(this.store.select('auth'), { initialValue: initialAuthState });
   private readonly storedUser = signal<{ name?: string; email?: string; phone?: string } | null>(null);
   user = computed(() => this.authState().user ?? this.storedUser() ?? {});
@@ -70,7 +72,7 @@ export class ProfilePage implements OnInit {
 
   ngOnInit() {
     try {
-      this.storedUser.set(JSON.parse(localStorage.getItem('user') || 'null'));
+      this.storedUser.set(JSON.parse(localStorage.getItem(MOBILE_STORAGE_KEYS.user) || 'null'));
     } catch {
       this.storedUser.set(null);
     }

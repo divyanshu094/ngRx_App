@@ -2,8 +2,8 @@
   <main class="mx-auto max-w-4xl px-4 py-6">
     <header class="mb-6 flex items-center justify-between gap-4">
       <div>
-        <p class="text-sm font-medium text-emerald-700">ACCOUNT</p>
-        <h1 class="text-2xl font-bold text-slate-950">Payment history</h1>
+        <p class="text-sm font-medium text-emerald-700">{{ text.payments.account }}</p>
+        <h1 class="text-2xl font-bold text-slate-950">{{ text.payments.title }}</h1>
       </div>
       <ion-button fill="outline" (click)="refresh()" [disabled]="loading()">
         <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
@@ -15,7 +15,7 @@
     }
 
     @if (loading() && !transactions().length) {
-      <p class="py-12 text-center text-slate-500">Loading payment activity…</p>
+      <p class="py-12 text-center text-slate-500">{{ text.payments.loading }}</p>
     } @else {
       <section class="divide-y divide-slate-200 border-y border-slate-200 bg-white">
         @for (transaction of transactions(); track transaction._id) {
@@ -25,26 +25,26 @@
                 <h2 class="font-semibold capitalize text-slate-950">{{ transaction.type }} · {{ transaction.status }}</h2>
                 <span class="text-xs uppercase text-slate-500">{{ transaction.provider }}</span>
               </div>
-              <p class="mt-1 text-sm text-slate-600">{{ orderNumber(transaction) }} · {{ transaction.method || 'Payment' }}</p>
+              <p class="mt-1 text-sm text-slate-600">{{ orderNumber(transaction) }} · {{ transaction.method || text.payments.payment }}</p>
               <p class="mt-1 text-xs text-slate-500">{{ transaction.createdAt | date:'medium' }}</p>
               @if (transaction.failureDescription) {
                 <p class="mt-2 text-sm text-red-700">{{ transaction.failureDescription }}</p>
               }
               @if (transaction.gatewayPaymentId || transaction.gatewayRefundId) {
-                <p class="mt-1 truncate text-xs text-slate-400">Reference: {{ transaction.gatewayRefundId || transaction.gatewayPaymentId }}</p>
+                <p class="mt-1 truncate text-xs text-slate-400">{{ text.payments.reference }} {{ transaction.gatewayRefundId || transaction.gatewayPaymentId }}</p>
               }
             </div>
             <p class="font-semibold text-slate-950">{{ amountMajor(transaction) | currency:transaction.currency:'symbol' }}</p>
           </article>
         } @empty {
           <div class="px-4 py-12 text-center">
-            <h2 class="font-semibold text-slate-900">No payment activity</h2>
-            <p class="mt-1 text-sm text-slate-600">Payments and refunds will appear here.</p>
+            <h2 class="font-semibold text-slate-900">{{ text.payments.emptyTitle }}</h2>
+            <p class="mt-1 text-sm text-slate-600">{{ text.payments.emptyDescription }}</p>
           </div>
         }
       </section>
       @if (total() > transactions().length) {
-        <p class="mt-3 text-right text-xs text-slate-500">Showing the latest {{ transactions().length }} of {{ total() }} transactions</p>
+        <p class="mt-3 text-right text-xs text-slate-500">{{ text.payments.showing.replace('{{shown}}', transactions().length.toString()).replace('{{total}}', total().toString()) }}</p>
       }
     }
   </main>

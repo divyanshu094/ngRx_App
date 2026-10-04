@@ -34,7 +34,7 @@
                 <ion-icon
                   name="location"
                 ></ion-icon>
-                Delivering to
+                {{ text.dashboard.deliveringTo }}
               </p>
 
               <div
@@ -82,7 +82,7 @@
 
           <ion-input
             [value]="searchTerm()"
-            placeholder="Search..."
+            [placeholder]="text.dashboard.search"
             class="text-slate-700"
             (ionInput)="onSearchChange($event)"
           >
@@ -141,7 +141,7 @@
     <ion-infinite-scroll threshold="150px" (ionInfinite)="loadMore($event)">
       <ion-infinite-scroll-content
         loadingSpinner="bubbles"
-        loadingText="Loading more products..."
+        [loadingText]="text.dashboard.loadingProducts"
       ></ion-infinite-scroll-content>
     </ion-infinite-scroll>
   </div>
@@ -155,16 +155,16 @@
     >
       <div class="flex flex-col">
         <span class="text-sm font-semibold text-black">
-          {{ bucketCount() }} items added
+          {{ text.dashboard.itemsAdded.replace('{{count}}', bucketCount().toString()) }}
         </span>
 
-        <span class="text-xs text-black"> Ready to checkout </span>
+        <span class="text-xs text-black">{{ text.dashboard.readyToCheckout }}</span>
       </div>
 
       <ion-button routerLink="/cart" color="light" class="cart-btn m-0">
         <ion-icon slot="start" name="cart"></ion-icon>
 
-        View Cart
+        {{ text.dashboard.viewCart }}
       </ion-button>
     </div>
   </div>

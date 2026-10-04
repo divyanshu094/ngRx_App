@@ -8,7 +8,7 @@
         <ion-button fill="clear" routerLink="/dashboard" class="text-black">
           <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
         </ion-button>
-        <h1 class="text-2xl font-bold text-slate-900">Shopping Cart</h1>
+        <h1 class="text-2xl font-bold text-slate-900">{{ text.cart.title }}</h1>
       </div>
     </div>
 
@@ -19,7 +19,7 @@
           class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200/80 sticky top-6"
         >
           <h3 class="text-lg font-semibold text-slate-900 mb-4">
-            Order Summary
+            {{ text.cart.summary }}
           </h3>
 
           <!-- Cart Items -->
@@ -37,7 +37,7 @@
                 <p class="text-sm font-medium text-slate-900 truncate">
                   {{ item.name }}
                 </p>
-                <p class="text-xs text-slate-500">Qty: {{ item.quantity }}</p>
+                <p class="text-xs text-slate-500">{{ text.cart.quantity.replace('{{count}}', item.quantity.toString()) }}</p>
               </div>
               <div class="flex flex-col items-end gap-1">
                 <div
@@ -93,31 +93,31 @@
           <!-- Price Breakdown -->
           <div class="border-t border-slate-400 pt-2 space-y-2">
             <div class="flex justify-between text-sm">
-              <span class="text-slate-600">Subtotal</span>
+              <span class="text-slate-600">{{ text.cart.subtotal }}</span>
               <span class="text-slate-900 font-medium"
                 >{{ totalPrice() |currency:'INR':'symbol' }}</span
               >
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-slate-600">Delivery Fee</span>
+              <span class="text-slate-600">{{ text.cart.deliveryFee }}</span>
               <span class="text-slate-600 font-medium line-through"
                 >{{ deliveryFee() |currency:'INR':'symbol' }}</span
               >
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-slate-600">GST (5%)</span>
+              <span class="text-slate-600">{{ text.cart.gst }}</span>
               <span class="text-slate-900 font-medium">{{ gst() |currency:'INR':'symbol' }}</span>
             </div>
             <div
               class="flex justify-between text-lg font-semibold pt-2 border-t border-slate-400"
             >
-              <span class="text-slate-900">Total</span>
+              <span class="text-slate-900">{{ text.cart.total }}</span>
               <span class="text-emerald-600">{{ grandTotal() | currency:'INR':'symbol' }}</span>
             </div>
           </div>
 
           <p class="text-xs text-slate-500 text-center mt-3">
-            By placing order, you agree to our Terms & Conditions
+            {{ text.cart.terms }}
           </p>
         </div>
       </div>
@@ -128,14 +128,14 @@
         >
           <!-- Left -->
           <div class="flex flex-col">
-            <span class="text-sm font-semibold text-black"> Delivering To </span>
+            <span class="text-sm font-semibold text-black">{{ text.cart.deliveringTo }}</span>
 
             <span class="text-xs text-black capitalize"> {{ selectedAddress() }} </span>
           </div>
 
           <!-- Right -->
           <ion-button fill="solid" color="primary" routerLink="/checkout">
-            Checkout · {{grandTotal() | currency:'INR':'symbol' }}
+            {{ text.cart.checkout }} · {{grandTotal() | currency:'INR':'symbol' }}
           </ion-button>
         </div>
       </div>
@@ -144,7 +144,7 @@
       <div
         class="rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600"
       >
-        Your cart is empty. Add fresh groceries to continue.
+        {{ text.cart.empty }}
       </div>
     </ng-container>
   </div>

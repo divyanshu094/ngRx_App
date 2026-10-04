@@ -2,13 +2,13 @@
   <main class="mx-auto max-w-4xl px-4 py-6">
     <header class="mb-6 flex flex-wrap items-center justify-between gap-4">
       <div>
-        <p class="text-sm font-medium text-emerald-700">DELIVERY PARTNER</p>
-        <h1 class="text-2xl font-bold text-slate-950">Delivery queue</h1>
+        <p class="text-sm font-medium text-emerald-700">{{ text.delivery.role }}</p>
+        <h1 class="text-2xl font-bold text-slate-950">{{ text.delivery.title }}</h1>
       </div>
       <div class="flex gap-2">
         <ion-button fill="outline" (click)="updateLocation()">
           <ion-icon name="locate-outline" slot="start"></ion-icon>
-          Update location
+          {{ text.delivery.updateLocation }}
         </ion-button>
         <ion-button fill="outline" (click)="refresh()" [disabled]="loading()">
           <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
@@ -21,7 +21,7 @@
     }
 
     <section class="mb-8">
-      <h2 class="mb-3 text-lg font-semibold text-slate-900">Available orders</h2>
+      <h2 class="mb-3 text-lg font-semibold text-slate-900">{{ text.delivery.available }}</h2>
       <div class="divide-y divide-slate-200 border-y border-slate-200 bg-white">
         @for (order of availableOrders(); track order._id) {
           <article class="p-4 sm:p-5">
@@ -30,24 +30,24 @@
                 <h3 class="font-semibold text-slate-950">{{ customerName(order) }}</h3>
                 <p class="mt-1 text-sm text-slate-500">{{ order.tracking?.trackingNumber || order._id }}</p>
                 @if (order.user?.phone) {
-                  <a class="text-sm text-emerald-800 underline" [href]="'tel:' + order.user?.phone">Call customer</a>
+                  <a class="text-sm text-emerald-800 underline" [href]="'tel:' + order.user?.phone">{{ text.delivery.callCustomer }}</a>
                 }
               </div>
               <p class="font-semibold text-slate-950">{{ order.total | currency:'INR':'symbol' }}</p>
             </div>
-            <p class="mt-3 text-sm text-slate-600">{{ order.items.length }} items · {{ order.payment.method | uppercase }}</p>
+            <p class="mt-3 text-sm text-slate-600">{{ text.delivery.itemCount.replace('{{count}}', order.items.length.toString()).replace('{{method}}', order.payment.method | uppercase) }}</p>
             <ion-button size="small" class="mt-3" (click)="accept(order._id)" [disabled]="busyOrderId() === order._id">
-              Accept delivery
+              {{ text.delivery.accept }}
             </ion-button>
           </article>
         } @empty {
-          <p class="p-5 text-sm text-slate-500">No orders are ready for delivery.</p>
+          <p class="p-5 text-sm text-slate-500">{{ text.delivery.noAvailable }}</p>
         }
       </div>
     </section>
 
     <section>
-      <h2 class="mb-3 text-lg font-semibold text-slate-900">Assigned to me</h2>
+      <h2 class="mb-3 text-lg font-semibold text-slate-900">{{ text.delivery.assigned }}</h2>
       <div class="divide-y divide-slate-200 border-y border-slate-200 bg-white">
         @for (order of assignedOrders(); track order._id) {
           <article class="p-4 sm:p-5">
@@ -56,20 +56,20 @@
                 <h3 class="font-semibold capitalize text-slate-950">{{ order.tracking?.status || order.status }}</h3>
                 <p class="mt-1 text-sm text-slate-500">{{ customerName(order) }} · {{ order.tracking?.trackingNumber || order._id }}</p>
                 @if (order.user?.phone) {
-                  <a class="text-sm text-emerald-800 underline" [href]="'tel:' + order.user?.phone">Call customer</a>
+                  <a class="text-sm text-emerald-800 underline" [href]="'tel:' + order.user?.phone">{{ text.delivery.callCustomer }}</a>
                 }
               </div>
               <p class="font-semibold text-slate-950">{{ order.total | currency:'INR':'symbol' }}</p>
             </div>
-            <p class="mt-3 text-sm text-slate-600">{{ order.items.length }} items</p>
+            <p class="mt-3 text-sm text-slate-600">{{ text.delivery.itemCountShort.replace('{{count}}', order.items.length.toString()) }}</p>
             @if (nextAction(order); as action) {
               <ion-button size="small" class="mt-3" (click)="updateStatus(order._id, action)" [disabled]="busyOrderId() === order._id">
-                {{ action === 'picked' ? 'Mark picked up' : 'Mark delivered' }}
+                {{ action === 'picked' ? text.delivery.markPickedUp : text.delivery.markDelivered }}
               </ion-button>
             }
           </article>
         } @empty {
-          <p class="p-5 text-sm text-slate-500">You have no assigned deliveries.</p>
+          <p class="p-5 text-sm text-slate-500">{{ text.delivery.noAssigned }}</p>
         }
       </div>
     </section>
@@ -77,7 +77,7 @@
     <div class="mt-8">
       <ion-button expand="block" fill="outline" color="medium" (click)="signOut()">
         <ion-icon name="log-out-outline" slot="start"></ion-icon>
-        Sign out
+        {{ text.delivery.signOut }}
       </ion-button>
     </div>
   </main>

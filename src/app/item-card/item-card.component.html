@@ -10,7 +10,7 @@
     <div
       class="absolute left-2 top-2 rounded-[0.5rem] bg-pink-500 px-2 py-1 text-[11px] font-bold leading-tight text-white"
     >
-      {{ item.discountPercentage }}% OFF
+      {{ item.discountPercentage }}{{ text.product.off }}
     </div>
     }
 
@@ -62,7 +62,7 @@
           class="add-btn bg-white"
           (click)="increase(item)"
         >
-          ADD
+          {{ text.product.add }}
         </ion-button>
       }
     </div>

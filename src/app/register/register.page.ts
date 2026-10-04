@@ -11,6 +11,7 @@ import { RegisterRequest } from '../models/user.model';
 import { AppState } from '../store';
 import { register } from '../store/actions/auth.actions';
 import { initialAuthState } from '../store/reducers/auth.reducer';
+import { MOBILE_APP_TEXT } from '../constants/app.constants';
 
 @Component({
   selector: 'app-register',
@@ -20,6 +21,7 @@ import { initialAuthState } from '../store/reducers/auth.reducer';
   imports: [IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonCheckbox, CommonModule, FormsModule, ReactiveFormsModule, RouterLink]
 })
 export class RegisterPage implements OnInit {
+  readonly text = MOBILE_APP_TEXT;
   registerForm!: FormGroup;
   private readonly authState = toSignal(this.store.select('auth'), { initialValue: initialAuthState });
   private readonly validationError = signal('');
@@ -82,7 +84,7 @@ export class RegisterPage implements OnInit {
 
   onSubmit() {
     if (this.registerForm.invalid) {
-      this.validationError.set('Please fill all fields correctly');
+      this.validationError.set(this.text.registration.requiredFields);
       return;
     }
 

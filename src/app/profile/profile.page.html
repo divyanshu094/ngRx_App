@@ -7,7 +7,7 @@
         <ion-button fill="clear" routerLink="/dashboard" class="text-black">
           <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
         </ion-button>
-        <h1 class="text-2xl font-bold text-slate-900">My Profile</h1>
+        <h1 class="text-2xl font-bold text-slate-900">{{ text.profile.title }}</h1>
       </div>
     </div>
 
@@ -42,7 +42,7 @@
         ></ion-icon>
 
         <span class="text-center font-semibold text-[15px] leading-6">
-          Your Orders
+          {{ text.profile.yourOrders }}
         </span>
       </div>
 
@@ -55,7 +55,7 @@
         ></ion-icon>
 
         <span class="text-center font-semibold text-[15px] leading-6">
-          Help & Support
+          {{ text.profile.helpSupport }}
         </span>
       </div>
 
@@ -68,14 +68,14 @@
         ></ion-icon>
 
         <span class="text-center font-semibold text-[15px] leading-6">
-          Your Wishlist
+          {{ text.profile.wishlist }}
         </span>
       </div>
     </div>
 
     <!-- Information Section -->
     <div class="px-4 mt-10">
-      <h2 class="text-3xl font-bold text-black mb-5">Your Information</h2>
+      <h2 class="text-3xl font-bold text-black mb-5">{{ text.profile.information }}</h2>
 
       <div class="bg-white rounded-3xl overflow-hidden shadow-sm">
         <!-- Item -->
@@ -88,10 +88,10 @@
 
             <div>
               <h4 class="text-[17px] font-semibold text-black">
-                Saved Addresses
+                {{ text.profile.savedAddresses }}
               </h4>
 
-              <p class="text-sm text-gray-500 mt-1">Manage delivery addresses</p>
+              <p class="text-sm text-gray-500 mt-1">{{ text.profile.manageAddresses }}</p>
             </div>
           </div>
 
@@ -113,7 +113,7 @@
             ></ion-icon>
 
             <span class="text-[17px] font-semibold text-black">
-              Payment history
+              {{ text.profile.paymentHistory }}
             </span>
           </div>
 
@@ -134,7 +134,7 @@
             ></ion-icon>
 
             <span class="text-[17px] font-semibold text-black">
-              Your Wishlist
+              {{ text.profile.wishlist }}
             </span>
           </div>
 
@@ -155,7 +155,7 @@
             ></ion-icon>
 
             <span class="text-[17px] font-semibold text-black">
-              E-Gift Cards
+              {{ text.profile.giftCards }}
             </span>
           </div>
 
@@ -176,7 +176,7 @@
             ></ion-icon>
 
             <span class="text-[17px] font-semibold text-black">
-              Help & Support
+              {{ text.profile.helpSupport }}
             </span>
           </div>
 
@@ -191,7 +191,7 @@
     <div class="px-4 mt-8">
       <ion-button expand="block" fill="outline" color="medium" (click)="signOut()">
         <ion-icon name="log-out-outline" slot="start"></ion-icon>
-        Sign out
+        {{ text.profile.signOut }}
       </ion-button>
     </div>
   </div>

@@ -10,6 +10,7 @@ import { AppState } from '../store';
 import { resendOtp, verifyOtp } from '../store/actions/auth.actions';
 import { initialAuthState } from '../store/reducers/auth.reducer';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MOBILE_APP_TEXT, MOBILE_CONFIG, MOBILE_ROUTES, MOBILE_STORAGE_KEYS } from '../constants/app.constants';
 
 @Component({
   selector: 'app-verify-email',
@@ -19,6 +20,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
   imports: [IonContent, IonButton, IonIcon, IonInput, IonText, CommonModule, FormsModule, ReactiveFormsModule, RouterLink]
 })
 export class VerifyEmailPage implements OnInit, OnDestroy {
+  readonly text = MOBILE_APP_TEXT;
   verifyForm!: FormGroup;
   private readonly authState = toSignal(this.store.select('auth'), { initialValue: initialAuthState });
   private readonly localError = signal('');
@@ -31,7 +33,9 @@ export class VerifyEmailPage implements OnInit, OnDestroy {
   verificationCode = computed(() => this.authState().debugVerificationCode || this.routeVerificationCode());
   
   // OTP timer
-  timeLeft = signal(300); // 5 minutes
+  readonly otpLength = MOBILE_CONFIG.otpLength;
+  readonly otpPlaceholder = '0'.repeat(this.otpLength);
+  timeLeft = signal(MOBILE_CONFIG.otpExpirySeconds);
   timerActive = signal(true);
   canResend = signal(false);
   
@@ -46,9 +50,9 @@ export class VerifyEmailPage implements OnInit, OnDestroy {
       if (this.authState().emailVerified) {
         this.timerActive.set(false);
         setTimeout(() => {
-          localStorage.removeItem('pendingVerificationEmail');
-          this.router.navigate(['/login']);
-        }, 2000);
+          localStorage.removeItem(MOBILE_STORAGE_KEYS.pendingVerificationEmail);
+          this.router.navigate([MOBILE_ROUTES.login]);
+        }, MOBILE_CONFIG.verifiedRedirectDelayMs);
       }
     });
   }
@@ -65,7 +69,7 @@ export class VerifyEmailPage implements OnInit, OnDestroy {
 
   initializeForm() {
     this.verifyForm = this.formBuilder.group({
-      otp: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
+      otp: ['', [Validators.required, Validators.pattern(new RegExp(`^\\d{${this.otpLength}}$`))]]
     });
   }
 
@@ -77,7 +81,7 @@ export class VerifyEmailPage implements OnInit, OnDestroy {
       this.routeVerificationCode.set(navigation.extras.state['verificationCode'] || '');
     } else {
       // Fallback: try to get from route params or local storage
-      const storedEmail = localStorage.getItem('pendingVerificationEmail');
+      const storedEmail = localStorage.getItem(MOBILE_STORAGE_KEYS.pendingVerificationEmail);
       if (storedEmail) {
         this.email.set(storedEmail);
       }
@@ -98,7 +102,7 @@ export class VerifyEmailPage implements OnInit, OnDestroy {
       } else {
         clearInterval(timer);
       }
-    }, 1000);
+    }, MOBILE_CONFIG.otpTimerIntervalMs);
   }
 
   getFormattedTime(): string {
@@ -110,7 +114,7 @@ export class VerifyEmailPage implements OnInit, OnDestroy {
 
   onSubmit() {
     if (this.verifyForm.invalid) {
-      this.localError.set('Please enter a valid 6-digit OTP');
+      this.localError.set(this.text.verification.invalidCodeEntry.replace('{{length}}', this.otpLength.toString()));
       return;
     }
 
@@ -124,7 +128,7 @@ export class VerifyEmailPage implements OnInit, OnDestroy {
   onResendOTP() {
     this.localError.set('');
     this.localMessage.set('');
-    this.timeLeft.set(300);
+    this.timeLeft.set(MOBILE_CONFIG.otpExpirySeconds);
     this.timerActive.set(true);
     this.canResend.set(false);
     this.verifyForm.reset();

@@ -3,6 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { loadGroceries, loadGroceriesSuccess, loadGroceriesFailure } from '../actions/grocery.action';
 import { catchError, map, switchMap, of } from 'rxjs';
 import { ApiService } from 'src/app/services/api-service/api-service';
+import { MOBILE_API_ENDPOINTS, MOBILE_CONFIG } from '../../constants/app.constants';
 
 @Injectable()
 export class GroceryEffects {
@@ -14,8 +15,7 @@ export class GroceryEffects {
     this.actions$.pipe(
       ofType(loadGroceries),
       switchMap(({ page = 1, append = false }) => {
-        const limit = 20;
-        const endpoint = `products?page=${page}&limit=${limit}`;
+        const endpoint = MOBILE_API_ENDPOINTS.products.list(page, MOBILE_CONFIG.productsPageSize);
         return this.api.getData(endpoint).pipe(
           map((response: any) => {
             const products: any[] = Array.isArray(response)
@@ -35,13 +35,13 @@ export class GroceryEffects {
                 description: product.description ?? product.summary ?? '',
                 price: typeof product.price === 'object'
                   ? {
-                      currency: product.price.currency ?? 'INR',
+                      currency: product.price.currency ?? MOBILE_CONFIG.currency,
                       amount: product.price.amount ?? product.price.finalAmount ?? 0,
                       discount: product.price.discount,
                       finalAmount: product.price.finalAmount ?? product.price.amount ?? 0,
                     }
                   : {
-                      currency: 'INR',
+                      currency: MOBILE_CONFIG.currency,
                       amount: Number(product.price ?? 0),
                       finalAmount: Number(product.price ?? 0),
                     },

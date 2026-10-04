@@ -37,6 +37,7 @@ import { LoggerService } from '../services/logger-service';
 import { ItemCardComponent } from '../item-card/item-card.component';
 import { AppState } from '../store';
 import { Category } from '../models/category.model';
+import { MOBILE_APP_TEXT, MOBILE_STORAGE_KEYS } from '../constants/app.constants';
 
 @Component({
   selector: 'app-dashboard',
@@ -57,6 +58,7 @@ import { Category } from '../models/category.model';
   ],
 })
 export class DashboardPage implements OnInit {
+  readonly text = MOBILE_APP_TEXT;
   isScrolled = signal(false);
   groceries: Signal<Product[]> = signal<Product[]>([]);
   bucketItems: Signal<Bucket[]> = signal([]);
@@ -95,7 +97,7 @@ export class DashboardPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    const savedAddress = localStorage.getItem('selectedAddress');
+    const savedAddress = localStorage.getItem(MOBILE_STORAGE_KEYS.selectedAddress);
     if (savedAddress) {
       const address = JSON.parse(savedAddress);
 

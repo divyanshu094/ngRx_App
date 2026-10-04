@@ -2,12 +2,12 @@
   <main class="mx-auto max-w-4xl px-4 py-6">
     <header class="mb-6 flex items-center justify-between gap-4">
       <div>
-        <p class="text-sm font-medium text-emerald-700">ACCOUNT</p>
-        <h1 class="text-2xl font-bold text-slate-950">Your orders</h1>
+        <p class="text-sm font-medium text-emerald-700">{{ text.orders.account }}</p>
+        <h1 class="text-2xl font-bold text-slate-950">{{ text.orders.title }}</h1>
       </div>
       <ion-button fill="outline" (click)="load()" [disabled]="loading()">
         <ion-icon name="refresh" slot="start"></ion-icon>
-        Refresh
+        {{ text.orders.refresh }}
       </ion-button>
     </header>
 
@@ -16,7 +16,7 @@
     }
 
     @if (loading() && !orders().length) {
-      <p class="py-12 text-center text-slate-500">Loading your orders…</p>
+      <p class="py-12 text-center text-slate-500">{{ text.orders.loading }}</p>
     } @else {
       <section class="divide-y divide-slate-200 border-y border-slate-200 bg-white">
         @for (order of orders(); track order._id) {
@@ -38,7 +38,7 @@
                   <img [src]="productImage(item)" [alt]="productName(item)" class="h-12 w-12 object-cover" />
                   <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-medium text-slate-900">{{ productName(item) }}</p>
-                    <p class="text-xs text-slate-500">Qty {{ item.quantity }}</p>
+                    <p class="text-xs text-slate-500">{{ text.orders.quantity.replace('{{count}}', item.quantity.toString()) }}</p>
                   </div>
                   <span class="text-sm text-slate-700">{{ item.price * item.quantity | currency:'INR':'symbol' }}</span>
                 </div>
@@ -46,12 +46,12 @@
             </div>
 
             <div class="mt-5 flex flex-wrap gap-2">
-              <ion-button size="small" fill="outline" (click)="track(order._id)">Track order</ion-button>
+              <ion-button size="small" fill="outline" (click)="track(order._id)">{{ text.orders.track }}</ion-button>
               @if (canPay(order)) {
-                <ion-button size="small" (click)="pay(order._id)">Pay now</ion-button>
+                <ion-button size="small" (click)="pay(order._id)">{{ text.orders.payNow }}</ion-button>
               }
               @if (canCancel(order)) {
-                <ion-button size="small" fill="clear" color="danger" (click)="cancel(order._id)">Cancel</ion-button>
+                <ion-button size="small" fill="clear" color="danger" (click)="cancel(order._id)">{{ text.orders.cancel }}</ion-button>
               }
             </div>
 
@@ -59,24 +59,24 @@
               <div class="mt-4 border-l-2 border-emerald-600 bg-emerald-50 p-4">
                 <p class="font-semibold text-slate-900">{{ detail.tracking?.status || detail.status }}</p>
                 @if (detail.tracking?.estimatedDelivery) {
-                  <p class="mt-1 text-sm text-slate-600">Estimated {{ detail.tracking?.estimatedDelivery | date:'medium' }}</p>
+                  <p class="mt-1 text-sm text-slate-600">{{ text.orders.estimated.replace('{{date}}', (detail.tracking?.estimatedDelivery | date:'medium') || '') }}</p>
                 }
                 @if (detail.deliveryAgent) {
                   <p class="mt-2 text-sm text-slate-700">{{ detail.deliveryAgent.name }} · {{ detail.deliveryAgent.vehicleType }}</p>
                   @if (detail.deliveryAgent.phone) {
-                    <a class="text-sm text-emerald-800 underline" [href]="'tel:' + detail.deliveryAgent.phone">Call delivery partner</a>
+                    <a class="text-sm text-emerald-800 underline" [href]="'tel:' + detail.deliveryAgent.phone">{{ text.orders.callDeliveryPartner }}</a>
                   }
                 }
                 @if (['shipped', 'processing'].includes(detail.status)) {
-                  <p class="mt-2 text-xs text-slate-500">Status refreshes automatically.</p>
+                  <p class="mt-2 text-xs text-slate-500">{{ text.orders.autoRefresh }}</p>
                 }
               </div>
             }
           </article>
         } @empty {
           <div class="px-4 py-12 text-center">
-            <h2 class="font-semibold text-slate-900">No orders yet</h2>
-            <p class="mt-1 text-sm text-slate-600">Your completed checkouts will appear here.</p>
+            <h2 class="font-semibold text-slate-900">{{ text.orders.emptyTitle }}</h2>
+            <p class="mt-1 text-sm text-slate-600">{{ text.orders.emptyDescription }}</p>
           </div>
         }
       </section>

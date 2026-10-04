@@ -25,8 +25,8 @@
           >
             <ion-icon name="leaf" class="text-2xl text-white"></ion-icon>
           </div> -->
-          <h1 class="text-4xl font-bold text-slate-900">Softiqo</h1>
-          <p class="mt-2 text-slate-600">Fresh groceries, delivered fast</p>
+          <h1 class="text-4xl font-bold text-slate-900">{{ text.name }}</h1>
+          <p class="mt-2 text-slate-600">{{ text.description }}</p>
         </div>
 
         <!-- Wave -->
@@ -48,7 +48,7 @@
       <div class="px-7 pb-10 -mt-10 relative z-10">
         <!-- Title -->
         <h1 class="text-4xl font-bold text-gray-800">
-          Sign <span class="underline decoration-[#ff8f8f]">in</span>
+          {{ text.login.title }}
         </h1>
 
         <!-- Form -->
@@ -60,7 +60,7 @@
 
           <!-- Email -->
           <div>
-            <label class="text-black text-s font-semibold"> Email </label>
+            <label class="text-black text-s font-semibold">{{ text.login.email }}</label>
 
             <div class="flex items-center border-b border-pink-200 py-2">
               <ion-icon
@@ -71,19 +71,19 @@
               <input
                 formControlName="email"
                 type="email"
-                placeholder="demo@email.com"
+                [placeholder]="text.login.emailPlaceholder"
                 class="w-full outline-none bg-transparent"
               />
             </div>
             <div *ngIf="email?.invalid && email?.touched" class="text-red-500 text-xs mt-1">
-              <span *ngIf="email?.errors?.['required']">Email is required</span>
-              <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>
+              <span *ngIf="email?.errors?.['required']">{{ text.login.emailRequired }}</span>
+              <span *ngIf="email?.errors?.['email']">{{ text.login.invalidEmail }}</span>
             </div>
           </div>
 
           <!-- Password -->
           <div>
-            <label class="text-black text-s font-semibold"> Password </label>
+            <label class="text-black text-s font-semibold">{{ text.login.password }}</label>
 
             <div class="flex items-center border-b border-pink-200 py-2">
               <ion-icon
@@ -94,7 +94,7 @@
               <input
                 formControlName="password"
                 [type]="showPassword() ? 'text' : 'password'"
-                placeholder="Enter your password"
+                [placeholder]="text.login.passwordPlaceholder"
                 class="w-full outline-none bg-transparent"
               />
 
@@ -105,8 +105,8 @@
               ></ion-icon>
             </div>
             <div *ngIf="password?.invalid && password?.touched" class="text-red-500 text-xs mt-1">
-              <span *ngIf="password?.errors?.['required']">Password is required</span>
-              <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+              <span *ngIf="password?.errors?.['required']">{{ text.login.passwordRequired }}</span>
+              <span *ngIf="password?.errors?.['minlength']">{{ text.login.minimumPassword }}</span>
             </div>
           </div>
 
@@ -114,11 +114,11 @@
           <div class="flex items-center justify-between text-xs">
             <label class="flex items-center gap-2 text-gray-600">
               <input formControlName="rememberMe" type="checkbox" class="accent-pink-400" />
-              Remember Me
+              {{ text.login.rememberMe }}
             </label>
 
             <a routerLink="/forgot-password" class="text-pink-400 font-semibold">
-              Forgot Password?
+              {{ text.login.forgotPassword }}
             </a>
           </div>
 
@@ -128,17 +128,17 @@
             [disabled]="loginForm.invalid || isLoading()"
             class="w-full bg-[#ff8f8f] text-white py-3 rounded-xl font-semibold shadow-md active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {{ isLoading() ? 'Logging in...' : 'Login' }}
+            {{ isLoading() ? text.login.loggingIn : text.login.signIn }}
           </button>
 
           <!-- Signup -->
           <p class="text-center text-gray-400 text-sm">
-            Don't have an Account ?
+            {{ text.login.noAccount }}
             <span
               class="text-[#ff8f8f] font-semibold cursor-pointer"
               routerLink="/register"
             >
-              Sign up
+              {{ text.login.signUp }}
             </span>
           </p>
         </form>

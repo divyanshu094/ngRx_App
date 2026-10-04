@@ -13,6 +13,7 @@ import { ApiService } from '../services/api-service/api-service';
 import { AppState } from '../store';
 import { placeOrder } from '../store/actions/order.actions';
 import { initialOrderState } from '../store/reducers/order.reducer';
+import { MOBILE_API_ENDPOINTS, MOBILE_APP_TEXT, MOBILE_STORAGE_KEYS } from '../constants/app.constants';
 
 interface SavedAddress {
   _id: string;
@@ -33,6 +34,7 @@ interface SavedAddress {
   imports: [IonContent, CommonModule, FormsModule, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonRadioGroup, IonRadio, HeaderComponent, RouterLink]
 })
 export class CheckoutPage implements OnInit {
+  readonly text = MOBILE_APP_TEXT;
   bucketItems: Signal<Bucket[]>;
   addresses = signal<SavedAddress[]>([]);
   selectedAddressId = signal('');
@@ -59,7 +61,7 @@ export class CheckoutPage implements OnInit {
   }
 
   ngOnInit() {
-    this.apiService.getData('addresses').subscribe({
+    this.apiService.getData(MOBILE_API_ENDPOINTS.addresses.list).subscribe({
       next: (response) => {
         this.addresses.set(response?.addresses ?? []);
         const savedAddressId = this.getSavedAddressId();
@@ -84,16 +86,16 @@ export class CheckoutPage implements OnInit {
     this.addressError.set('');
 
     if (!this.bucketItems().length) {
-      this.addressError.set('Your cart is empty.');
+      this.addressError.set(this.text.checkout.cartEmpty);
       return;
     }
     if (!this.selectedAddressId()) {
-      this.addressError.set('Choose or add a delivery address to continue.');
+      this.addressError.set(this.text.checkout.chooseAddress);
       return;
     }
 
     this.addressError.set('');
-    localStorage.setItem('selectedAddress', JSON.stringify(
+    localStorage.setItem(MOBILE_STORAGE_KEYS.selectedAddress, JSON.stringify(
       this.addresses().find((address) => address._id === this.selectedAddressId()),
     ));
     this.store.dispatch(placeOrder({
@@ -111,13 +113,13 @@ export class CheckoutPage implements OnInit {
 
   private getSavedAddressId(): string {
     try {
-      return JSON.parse(localStorage.getItem('selectedAddress') || '{}')._id ?? '';
+      return JSON.parse(localStorage.getItem(MOBILE_STORAGE_KEYS.selectedAddress) || '{}')._id ?? '';
     } catch {
       return '';
     }
   }
 
   private messageFrom(error: any): string {
-    return error?.error?.message || error?.message || 'Unable to complete checkout.';
+    return error?.error?.message || error?.message || this.text.errors.unableCheckout;
   }
 }

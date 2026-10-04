@@ -3,6 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { loadCategories, loadCategoriesSuccess, loadCategoriesFailure } from '../actions/category.action';
 import { catchError, map, switchMap, of } from 'rxjs';
 import { ApiService } from 'src/app/services/api-service/api-service';
+import { MOBILE_API_ENDPOINTS } from '../../constants/app.constants';
 
 @Injectable()
 export class CategoryEffects {
@@ -14,7 +15,7 @@ export class CategoryEffects {
     this.actions$.pipe(
       ofType(loadCategories),
       switchMap(() => {
-        return this.api.getData('categories').pipe(
+        return this.api.getData(MOBILE_API_ENDPOINTS.categories).pipe(
           map((response: any) => {
             const rawCategories: any[] = Array.isArray(response)
               ? response

@@ -37,6 +37,7 @@ import {
   increaseQuantity,
 } from '../store/actions/grocery.action';
 import { RouterLink } from '@angular/router';
+import { MOBILE_APP_TEXT, MOBILE_STORAGE_KEYS } from '../constants/app.constants';
 
 @Component({
   selector: 'app-cart',
@@ -46,6 +47,7 @@ import { RouterLink } from '@angular/router';
   imports: [IonContent, CommonModule, IonButton, IonIcon, RouterLink],
 })
 export class CartPage implements OnInit {
+  readonly text = MOBILE_APP_TEXT;
   bucketItems: Signal<Bucket[]> = signal([]);
   selectedAddress = signal('');
   totalPrice = computed(() =>
@@ -77,7 +79,7 @@ export class CartPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    const savedAddress = localStorage.getItem('selectedAddress');
+    const savedAddress = localStorage.getItem(MOBILE_STORAGE_KEYS.selectedAddress);
     if (savedAddress) {
       const address = JSON.parse(savedAddress);
 

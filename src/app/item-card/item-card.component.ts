@@ -14,6 +14,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addToBucket, removeFromBucket } from '../store/actions/bucket.action';
 import { CurrencyPipe } from '@angular/common';
+import { MOBILE_APP_TEXT } from '../constants/app.constants';
 
 @Component({
   selector: 'app-item-card',
@@ -22,6 +23,7 @@ import { CurrencyPipe } from '@angular/common';
   imports: [IonIcon, IonButton, IonCard, IonCardContent, CurrencyPipe],
 })
 export class ItemCardComponent implements OnInit {
+  readonly text = MOBILE_APP_TEXT;
   @Input() item!: Product;
 
   itemSignal = signal<Product | null>(null);

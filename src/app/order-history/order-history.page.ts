@@ -7,6 +7,7 @@ import { AppState } from '../store';
 import { cancelOrder, loadOrders, payOrder, stopTrackingOrder, trackOrder } from '../store/actions/order.actions';
 import { initialOrderState } from '../store/reducers/order.reducer';
 import { CustomerOrder, OrderItem } from '../models/order.model';
+import { MOBILE_APP_TEXT } from '../constants/app.constants';
 
 @Component({
   selector: 'app-order-history',
@@ -16,6 +17,7 @@ import { CustomerOrder, OrderItem } from '../models/order.model';
   imports: [IonContent, IonButton, IonIcon, CommonModule],
 })
 export class OrderHistoryPage implements OnInit, OnDestroy {
+  readonly text = MOBILE_APP_TEXT;
   private readonly orderState = toSignal(this.store.select('orders'), { initialValue: initialOrderState });
   orders = computed(() => this.orderState().orders);
   loading = computed(() => this.orderState().loading);
@@ -50,7 +52,7 @@ export class OrderHistoryPage implements OnInit, OnDestroy {
   }
 
   productName(item: OrderItem): string {
-    return typeof item.product === 'string' ? 'Product' : item.product?.name || 'Product';
+    return typeof item.product === 'string' ? this.text.errors.productFallback : item.product?.name || this.text.errors.productFallback;
   }
 
   productImage(item: OrderItem): string {
